@@ -1,0 +1,15 @@
+export const palette = {
+    background: "#181C20",
+    border: "#2A3238",
+    text: "#E5E5E5",
+    mutedText: "#B8B8B8",
+    accent: "#7CA6C7",
+    warning: "#C2A469",
+    badgeEasy: "#7A9C7A",
+    badgeMedium: "#C2A469",
+    badgeHard: "#B97A7A",
+    overlay: "rgba(30, 30, 30, 0.6)",
+    closeButton: "rgba(24, 28, 32, 0.7)",
+    warningBg: "rgba(194, 164, 105, 0.1)",
+    description: "#CCCCCC",
+};

@@ -1,3 +1,5 @@
+(global as any).GLOBAL = global;
+
 import { registerRootComponent } from 'expo';
 
 import App from './App';

@@ -1,14 +1,15 @@
 import { StyleSheet } from "react-native";
+import { palette } from "./palette";
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: palette.overlay,
   },
   modalContent: {
     height: "80%",
-    backgroundColor: "#0F1923",
+    backgroundColor: palette.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: "hidden",
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 16,
     right: 16,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: palette.closeButton,
     borderRadius: 20,
     padding: 8,
   },
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#fff",
+    color: palette.text,
     flex: 1,
     marginRight: 10,
   },
@@ -59,16 +60,16 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   easyBadge: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: palette.badgeEasy,
   },
   mediumBadge: {
-    backgroundColor: "#FF9800",
+    backgroundColor: palette.badgeMedium,
   },
   hardBadge: {
-    backgroundColor: "#F44336",
+    backgroundColor: palette.badgeHard,
   },
   visitedBadge: {
-    backgroundColor: "#2196F3",
+    backgroundColor: palette.accent,
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
@@ -77,14 +78,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   badgeText: {
-    color: "#fff",
+    color: palette.text,
     fontWeight: "600",
     marginLeft: 4,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: "#e0e0e0",
+    color: palette.description,
     marginBottom: 24,
   },
   actionContainer: {
@@ -92,26 +93,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: "#2E3A46",
+    borderTopColor: palette.border,
   },
   fixedActionContainer: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "#0F1923",
+    backgroundColor: palette.background,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: "#2E3A46",
+    borderTopColor: palette.border,
   },
   actionButton: {
     alignItems: "center",
   },
   actionText: {
-    color: "#fff",
+    color: palette.text,
     marginTop: 8,
   },
   infoRow: {
@@ -120,16 +121,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#2E3A46",
+    borderBottomColor: palette.border,
   },
   infoLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#b0b0b0",
+    color: palette.mutedText,
   },
   infoValue: {
     fontSize: 16,
-    color: "#ffffff",
+    color: palette.text,
   },
   warningsContainer: {
     marginTop: 16,
@@ -138,20 +139,20 @@ const styles = StyleSheet.create({
   warningsTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#FFA500",
+    color: palette.warning,
     marginBottom: 8,
   },
   warningItem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
-    backgroundColor: "rgba(255, 165, 0, 0.1)",
+    backgroundColor: palette.warningBg,
     padding: 10,
     borderRadius: 6,
   },
   warningText: {
     marginLeft: 8,
-    color: "#e0e0e0",
+    color: palette.description,
     flex: 1,
   },
 });

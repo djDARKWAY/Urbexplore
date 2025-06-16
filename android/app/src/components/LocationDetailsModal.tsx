@@ -1,7 +1,7 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import React, { useRef, useEffect } from "react";
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, Easing } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/detailsModal.styles";
+import styles from "../styles/darkTheme/detailsModal.styles";
 
 interface LocationDetailsModalProps {
   visible: boolean;
@@ -25,15 +25,30 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
   onClose,
   location,
 }) => {
+  const slideAnim = useRef(new Animated.Value(300)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 350,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      slideAnim.setValue(300);
+    }
+  }, [visible]);
+
   return (
     <Modal
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}> 
           <View style={styles.imageContainer}>
             <Image
               source={{ uri: location.imageUrl }}
@@ -101,7 +116,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
               <Text style={styles.actionText}>Compartilhar</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { palette } from "./palette";
 
 export const scaleBarStyles = StyleSheet.create({
   container: {
@@ -7,7 +8,7 @@ export const scaleBarStyles = StyleSheet.create({
     bottom: 65,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: `${palette.background}BB`,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 2,
@@ -15,12 +16,12 @@ export const scaleBarStyles = StyleSheet.create({
   bar: {
     width: 72,
     height: 5,
-    backgroundColor: "#fff",
+    backgroundColor: palette.text,
     borderRadius: 1000,
     marginRight: 8,
   },
   label: {
-    color: "#fff",
+    color: palette.text,
     fontSize: 12,
     fontWeight: "bold",
     textShadowColor: "#000",

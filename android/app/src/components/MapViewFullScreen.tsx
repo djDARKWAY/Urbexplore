@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, Alert, TouchableOpacity, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { mapStyles } from "../styles/map.styles";
+import { mapStyles } from "../styles/darkTheme/map.styles";
 import LocationDetailsModal from "./LocationDetailsModal";
 import { Ionicons } from '@expo/vector-icons';
-import { scaleBarStyles } from "../styles/scaleBar.styles";
+import { scaleBarStyles } from "../styles/darkTheme/scaleBar.styles";
+import MapTypeModal from "./MapTypeModal";
+import { googleMapsDarkStyle } from "../styles/darkTheme/googleMapsDarkStyle";
 
 interface Place {
   id: string;
@@ -27,44 +29,53 @@ const MapViewFullScreen = () => {
   const [places, setPlaces] = useState<Place[]>([]);
   const [selected, setSelected] = useState<Place | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [mapType, setMapType] = useState<'standard' | 'dark'>('dark');
+  const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false);
   const initialRegion = {
-    latitude: 39.5, // Centro de Portugal
+    latitude: 39.5,
     longitude: -8.0,
-    latitudeDelta: 5.5, // Abrange todo o país
+    latitudeDelta: 5.5,
     longitudeDelta: 6.5,
   };
   const [region, setRegion] = useState<any>(initialRegion);
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") throw new Error("Permissão negada");
-        let lastLoc = await Location.getLastKnownPositionAsync();
-        let loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
-        setLocation(loc);
-        const response = await fetch("http://192.168.1.95:3001/locations");
-        const data = await response.json();
-        setPlaces(data.locations.map((l: any) => ({
-          id: l._id || l.id,
-          name: l.name,
-          description: l.description,
-          coordinate: { latitude: l.lat, longitude: l.lon },
-          imageUrl: l.photos?.[0] || "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=2070",
-          difficulty: l.accessibility,
-          type: l.type,
-          condition: l.condition,
-          yearAbandoned: l.yearAbandoned,
-          warnings: l.warnings,
-        })));
-      } catch (e: any) {
-        Alert.alert("Erro", e.message || "Não foi possível carregar dados.");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") throw new Error("Permissão negada");
+      let lastLoc = await Location.getLastKnownPositionAsync();
+      let loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
+      setLocation(loc);
+      const response = await fetch("http://192.168.1.95:3001/locations");
+      const data = await response.json();
+      setPlaces(data.locations.map((l: any) => ({
+        id: l._id || l.id,
+        name: l.name,
+        description: l.description,
+        coordinate: { latitude: l.lat, longitude: l.lon },
+        imageUrl: l.photos?.[0],
+        difficulty: l.difficulty,
+        type: l.type,
+        condition: l.condition,
+        yearAbandoned: l.yearAbandoned,
+        warnings: l.warnings,
+        accessibility: l.accessibility,
+      })));
+    } catch (e: any) {
+      setError(e.message);
+      Alert.alert("Erro", e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const goToUserLocation = () => {
     if (location && mapRef.current) {
@@ -101,6 +112,14 @@ const MapViewFullScreen = () => {
     return (
       <View style={mapStyles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
+        {error && (
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text>
+            <TouchableOpacity onPress={fetchData} style={{ backgroundColor: '#333', padding: 10, borderRadius: 5 }}>
+              <Text style={{ color: '#fff' }}>Tentar Novamente</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   }
@@ -108,48 +127,66 @@ const MapViewFullScreen = () => {
   return (
     <View style={mapStyles.container}>
       <MapView
-        ref={mapRef}
-        style={mapStyles.map}
-        region={region}
-        onRegionChangeComplete={setRegion}
-        showsUserLocation
-        showsMyLocationButton={false}
-        showsCompass={false}
-        minZoomLevel={7}
-        toolbarEnabled={false}
+      ref={mapRef}
+      style={mapStyles.map}
+      region={region}
+      onRegionChangeComplete={setRegion}
+      showsUserLocation={true}
+      showsMyLocationButton={false}
+      showsCompass={false}
+      minZoomLevel={7}
+      maxZoomLevel={21}
+      toolbarEnabled={false}
+      mapType={mapType === 'standard' ? 'standard' : 'standard'}
+      customMapStyle={mapType === 'dark' ? googleMapsDarkStyle : []}
       >
-        {places.map((place) => (
-          <Marker
-            key={place.id}
-            coordinate={place.coordinate}
-            pinColor="#F44336"
-            onPress={() => { setSelected(place); setModalVisible(true); }}
-          />
-        ))}
+      {places.map((place) => (
+        <Marker
+        key={place.id}
+        coordinate={place.coordinate}
+        pinColor="#F44336"
+        onPress={() => { setSelected(place); setModalVisible(true); }}
+        />
+      ))}
       </MapView>
-      <TouchableOpacity style={mapStyles.currentLocationButton} onPress={goToUserLocation}>
-        <Ionicons name="locate" size={32} color="#007AFF" />
+      <TouchableOpacity
+      style={[mapStyles.button, mapStyles.filterButton]}
+      onPress={() => setMapTypeModalVisible(true)}
+      >
+      <Ionicons name="map" size={24} color="#AAAAAA" />
+      </TouchableOpacity>
+      <TouchableOpacity
+      style={[mapStyles.button, mapStyles.currentLocationButton]}
+      onPress={goToUserLocation}
+      >
+      <Ionicons name="locate" size={32} color="#AAAAAA" />
       </TouchableOpacity>
       {region && (() => {
-        const s = scaleBar(region, 72);
-        return (
-          <View style={scaleBarStyles.container}>
-            <View style={[scaleBarStyles.bar, { width: s.width }]} />
-            <View>
-              <Text style={scaleBarStyles.label}>{s.label}</Text>
-            </View>
-          </View>
-        );
+      const s = scaleBar(region, 72);
+      return (
+        <View style={scaleBarStyles.container}>
+        <View style={[scaleBarStyles.bar, { width: s.width }]} />
+        <View>
+          <Text style={scaleBarStyles.label}>{s.label}</Text>
+        </View>
+        </View>
+      );
       })()}
       {selected && (
-        <LocationDetailsModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          location={selected}
-        />
+      <LocationDetailsModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        location={selected}
+      />
       )}
+      <MapTypeModal
+        visible={mapTypeModalVisible}
+        selectedType={mapType}
+        onSelect={(type) => { setMapType(type); setMapTypeModalVisible(false); }}
+        onClose={() => setMapTypeModalVisible(false)}
+      />
     </View>
   );
-};
+}
 
 export default MapViewFullScreen;
