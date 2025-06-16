@@ -5,8 +5,8 @@ import styles from "../styles/darkTheme/mapModal.styles";
 
 interface MapTypeModalProps {
   visible: boolean;
-  selectedType: "standard" | "dark";
-  onSelect: (type: "standard" | "dark") => void;
+  selectedType: "standard" | "dark" | "satellite";
+  onSelect: (type: "standard" | "dark" | "satellite") => void;
   onClose: () => void;
 }
 
@@ -96,13 +96,13 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
-                paddingHorizontal: 24,
+                paddingHorizontal: 12,
                 marginTop: 24,
               }}
             >
               {/* Preview Standard */}
               <TouchableOpacity
-                style={{ alignItems: "center", flex: 1, marginRight: 8 }}
+                style={{ alignItems: "center", flex: 1, marginRight: 4 }}
                 onPress={() => {
                   onSelect("standard");
                   onClose();
@@ -110,8 +110,8 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               >
                 <View
                   style={{
-                    width: 100,
-                    height: 100,
+                    width: 90,
+                    height: 90,
                     borderRadius: 18,
                     borderWidth: selectedType === "standard" ? 3 : 1,
                     borderColor:
@@ -130,7 +130,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               </TouchableOpacity>
               {/* Preview Dark */}
               <TouchableOpacity
-                style={{ alignItems: "center", flex: 1, marginLeft: 8 }}
+                style={{ alignItems: "center", flex: 1, marginHorizontal: 4 }}
                 onPress={() => {
                   onSelect("dark");
                   onClose();
@@ -138,8 +138,8 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               >
                 <View
                   style={{
-                    width: 100,
-                    height: 100,
+                    width: 90,
+                    height: 90,
                     borderRadius: 18,
                     borderWidth: selectedType === "dark" ? 3 : 1,
                     borderColor: selectedType === "dark" ? "#4CE0B3" : "#444",
@@ -154,6 +154,34 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                   </Text>
                 </View>
                 <Text style={{ color: "#fff" }}>Escuro</Text>
+              </TouchableOpacity>
+              {/* Preview Satellite */}
+              <TouchableOpacity
+                style={{ alignItems: "center", flex: 1, marginLeft: 4 }}
+                onPress={() => {
+                  onSelect("satellite");
+                  onClose();
+                }}
+              >
+                <View
+                  style={{
+                    width: 90,
+                    height: 90,
+                    borderRadius: 18,
+                    borderWidth: selectedType === "satellite" ? 3 : 1,
+                    borderColor: selectedType === "satellite" ? "#4CE0B3" : "#444",
+                    backgroundColor: "#b0b0b0",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <Ionicons name="globe-outline" size={32} color="#222" />
+                  <Text style={{ color: "#222", fontWeight: "bold", marginTop: 4 }}>
+                    Satélite
+                  </Text>
+                </View>
+                <Text style={{ color: "#fff" }}>Satélite</Text>
               </TouchableOpacity>
             </View>
           ) : (

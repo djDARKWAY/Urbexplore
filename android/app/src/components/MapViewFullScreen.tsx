@@ -30,14 +30,9 @@ const MapViewFullScreen = () => {
   const [selected, setSelected] = useState<Place | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mapType, setMapType] = useState<'standard' | 'dark'>('dark');
+  const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite'>('standard');
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false);
-  const initialRegion = {
-    latitude: 39.5,
-    longitude: -8.0,
-    latitudeDelta: 5.5,
-    longitudeDelta: 6.5,
-  };
+  const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 };
   const [region, setRegion] = useState<any>(initialRegion);
   const mapRef = useRef<MapView>(null);
 
@@ -49,11 +44,16 @@ const MapViewFullScreen = () => {
     setLoading(true);
     setError(null);
     try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") throw new Error("Permissão negada");
-      let lastLoc = await Location.getLastKnownPositionAsync();
-      let loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
-      setLocation(loc);
+      let loc = null;
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === "granted") {
+          let lastLoc = await Location.getLastKnownPositionAsync();
+          loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
+          setLocation(loc);
+        }
+      } catch (locErr) {
+        }
       const response = await fetch("http://192.168.1.95:3001/locations");
       const data = await response.json();
       setPlaces(data.locations.map((l: any) => ({
@@ -137,7 +137,7 @@ const MapViewFullScreen = () => {
       minZoomLevel={7}
       maxZoomLevel={21}
       toolbarEnabled={false}
-      mapType={mapType === 'standard' ? 'standard' : 'standard'}
+      mapType={mapType === 'satellite' ? 'satellite' : 'standard'}
       customMapStyle={mapType === 'dark' ? googleMapsDarkStyle : []}
       >
       {places.map((place) => (
