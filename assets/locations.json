@@ -1,0 +1,60 @@
+[
+  {
+    "id": "a7e6f3b2-4a6d-4e2f-a4a3-13e8dabe9cb1",
+    "name": "Fábrica Têxtil São Jorge",
+    "type": "Fábrica",
+    "condition": "Parcialmente Intacto",
+    "yearAbandoned": 2003,
+    "description": "Antiga fábrica têxtil abandonada na margem do rio. Estruturas metálicas ainda visíveis, algumas salas acessíveis, mas com risco de queda de telhado.",
+    "lat": 41.2245,
+    "lon": -8.3357,
+    "photos": [
+      "https://exemplo.com/fotos/fabrica1.jpg",
+      "https://exemplo.com/fotos/fabrica2.jpg"
+    ],
+    "warnings": [
+      "Estrutura instável em certas áreas",
+      "Pisos escorregadios",
+      "Atenção a ferrugem e entulho"
+    ],
+    "accessibility": "Moderado"
+  },
+  {
+    "id": "f9c3c6a8-b8d9-4a44-914c-2b6482c4cfa3",
+    "name": "Hospital Psiquiátrico de Santa Luzia",
+    "type": "Hospital",
+    "condition": "Ruínas",
+    "yearAbandoned": 1991,
+    "description": "Hospital isolado e em ruínas. Grafitado, com vários pisos, escadas destruídas. Zona com relatos de assombrações, muito visitado por urbexers.",
+    "lat": 40.9123,
+    "lon": -8.5691,
+    "photos": [
+      "https://exemplo.com/fotos/hospital1.jpg",
+      "https://exemplo.com/fotos/hospital2.jpg"
+    ],
+    "warnings": [
+      "Risco de colapso estrutural",
+      "Entradas subterrâneas perigosas",
+      "Propriedade vigiada ocasionalmente"
+    ],
+    "accessibility": "Difícil"
+  },
+  {
+    "id": "d4a0c5e3-6d4c-47c1-8125-7e4937d799b0",
+    "name": "Escola Primária da Serra",
+    "type": "Escola",
+    "condition": "Intacto",
+    "yearAbandoned": null,
+    "description": "Pequena escola de aldeia com duas salas de aula, ainda com carteiras e quadros. Zona calma, excelente para sessões fotográficas. Muito bem conservada.",
+    "lat": 40.7228,
+    "lon": -7.9924,
+    "photos": [
+      "https://exemplo.com/fotos/escola1.jpg"
+    ],
+    "warnings": [
+      "Insetos e animais no interior",
+      "Pode haver moradores ocasionais (sem-abrigo)"
+    ],
+    "accessibility": "Fácil"
+  }
+]
