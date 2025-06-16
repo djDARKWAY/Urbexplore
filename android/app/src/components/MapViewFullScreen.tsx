@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, ActivityIndicator, Alert } from "react-native";
+import { View, ActivityIndicator, Alert, TouchableOpacity, StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { mapStyles } from "../styles/mapStyles";
 import LocationDetailsModal from "./LocationDetailsModal";
+import { Ionicons } from '@expo/vector-icons';
+
+const locationData = require("../../../../assets/locations.json");
 
 const MapViewFullScreen = () => {
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
@@ -11,37 +14,36 @@ const MapViewFullScreen = () => {
   const mapRef = useRef<MapView>(null);
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  
-  interface Place {
-    id: number;
+    interface Place {
+    id: string;
     name: string;
     description: string;
     coordinate: { latitude: number; longitude: number };
     imageUrl: string;
     difficulty?: string;
-    visited?: boolean;
+    type?: string;
+    condition?: string;
+    yearAbandoned?: number;
+    warnings?: string[];
+    accessibility?: string;
   }
 
-  const [interestingPlaces, setInterestingPlaces] = useState<Place[]>([
-    {
-      id: 1,
-      name: "Castelo Abandonado",
-      description: "Um castelo histórico abandonado do século XVIII, com ruínas bem preservadas e estruturas fascinantes para explorar. O local tem uma rica história e está rodeado por jardins encobertos pela vegetação.",
-      coordinate: { latitude: 41.1589, longitude: -8.6300 },
-      imageUrl: "https://images.unsplash.com/photo-1591825729269-caeb344f6df2?q=80&w=2070",
-      difficulty: "Medium",
-      visited: false
-    },
-    {
-      id: 2,
-      name: "Fábrica Antiga",
-      description: "Uma fábrica industrial abandonada dos anos 50 com maquinaria intacta e grandes espaços para explorar. A arquitetura industrial mantém características únicas da época.",
-      coordinate: { latitude: 41.1550, longitude: -8.6280 },
-      imageUrl: "https://images.unsplash.com/photo-1518769293-6a9dc113fb8c?q=80&w=2069",
-      difficulty: "Hard",
-      visited: true
-    }
-  ]);
+  const [interestingPlaces, setInterestingPlaces] = useState<Place[]>(
+    locationData.map((location: any) => ({
+      id: location.id,
+      name: location.name,
+      description: location.description,
+      coordinate: { latitude: location.lat, longitude: location.lon },
+      imageUrl: location.photos && location.photos.length > 0 
+        ? location.photos[0] 
+        : "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=2070",
+      difficulty: location.accessibility,
+      type: location.type,
+      condition: location.condition,
+      yearAbandoned: location.yearAbandoned,
+      warnings: location.warnings
+    }))
+  );
 
   useEffect(() => {
     (async () => {
@@ -107,18 +109,33 @@ const MapViewFullScreen = () => {
         }}        
         showsUserLocation={true}
         showsMyLocationButton={false}
+        showsCompass={false}
         minZoomLevel={7}
-      >
+        toolbarEnabled={false}      >
         {interestingPlaces.map(place => (
           <Marker
             key={place.id}
             coordinate={place.coordinate}
-            title={place.name}
+            title=""
+            pinColor="#F44336"
             onPress={() => handleMarkerPress(place)}
           />
         ))}
-      </MapView>
-      
+      </MapView><TouchableOpacity
+        style={mapStyles.currentLocationButton}
+        onPress={() => {
+          if (location && mapRef.current) {
+            mapRef.current.animateToRegion({
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+          }
+        }}
+      >
+        <Ionicons name="locate" size={32} color="#007AFF" />
+      </TouchableOpacity>
       {selectedLocation && (
         <LocationDetailsModal
           visible={modalVisible}
@@ -126,8 +143,7 @@ const MapViewFullScreen = () => {
           location={selectedLocation}
         />
       )}
-    </View>
-  );
+    </View>  );
 };
 
 export default MapViewFullScreen;

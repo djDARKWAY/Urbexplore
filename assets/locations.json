@@ -5,12 +5,11 @@
     "type": "Fábrica",
     "condition": "Parcialmente Intacto",
     "yearAbandoned": 2003,
-    "description": "Antiga fábrica têxtil abandonada na margem do rio. Estruturas metálicas ainda visíveis, algumas salas acessíveis, mas com risco de queda de telhado.",
+    "description": "Antiga fábrica têxtil abandonada na margem do rio Douro, distrito do Porto. Estruturas metálicas ainda visíveis, algumas salas acessíveis, mas com risco de queda de telhado.",
     "lat": 41.2245,
     "lon": -8.3357,
     "photos": [
-      "https://exemplo.com/fotos/fabrica1.jpg",
-      "https://exemplo.com/fotos/fabrica2.jpg"
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
     ],
     "warnings": [
       "Estrutura instável em certas áreas",
@@ -20,17 +19,16 @@
     "accessibility": "Moderado"
   },
   {
-    "id": "f9c3c6a8-b8d9-4a44-914c-2b6482c4cfa3",
-    "name": "Hospital Psiquiátrico de Santa Luzia",
+    "id": "b2d1e4f7-5c2a-4e1a-9b2e-1f2c3d4e5f6a",
+    "name": "Sanatório de Valongo",
     "type": "Hospital",
     "condition": "Ruínas",
-    "yearAbandoned": 1991,
-    "description": "Hospital isolado e em ruínas. Grafitado, com vários pisos, escadas destruídas. Zona com relatos de assombrações, muito visitado por urbexers.",
-    "lat": 40.9123,
-    "lon": -8.5691,
+    "yearAbandoned": 1987,
+    "description": "Antigo sanatório situado numa encosta de Valongo, distrito do Porto. Estrutura em ruínas, grafitada, com vários pisos e escadas destruídas.",
+    "lat": 41.1925,
+    "lon": -8.4952,
     "photos": [
-      "https://exemplo.com/fotos/hospital1.jpg",
-      "https://exemplo.com/fotos/hospital2.jpg"
+      "https://images.unsplash.com/photo-1464983953574-0892a716854b"
     ],
     "warnings": [
       "Risco de colapso estrutural",
@@ -40,21 +38,58 @@
     "accessibility": "Difícil"
   },
   {
-    "id": "d4a0c5e3-6d4c-47c1-8125-7e4937d799b0",
-    "name": "Escola Primária da Serra",
+    "id": "c3e2f1d4-7b8a-4c2d-8e1f-2a3b4c5d6e7f",
+    "name": "Escola Primária de Campanhã",
     "type": "Escola",
     "condition": "Intacto",
-    "yearAbandoned": null,
-    "description": "Pequena escola de aldeia com duas salas de aula, ainda com carteiras e quadros. Zona calma, excelente para sessões fotográficas. Muito bem conservada.",
-    "lat": 40.7228,
-    "lon": -7.9924,
+    "yearAbandoned": 2010,
+    "description": "Escola primária desativada na zona de Campanhã, Porto. Duas salas de aula, ainda com carteiras e quadros. Zona calma, excelente para sessões fotográficas.",
+    "lat": 41.1531,
+    "lon": -8.5857,
     "photos": [
-      "https://exemplo.com/fotos/escola1.jpg"
+      "https://images.unsplash.com/photo-1503676382389-4809596d5290"
     ],
     "warnings": [
       "Insetos e animais no interior",
       "Pode haver moradores ocasionais (sem-abrigo)"
     ],
     "accessibility": "Fácil"
+  },
+  {
+    "id": "d4f5e6a7-8b9c-4d2e-9f1a-3b4c5d6e7f8a",
+    "name": "Palacete Abandonado de Paranhos",
+    "type": "Palacete",
+    "condition": "Parcialmente Intacto",
+    "yearAbandoned": 1998,
+    "description": "Palacete antigo em Paranhos, Porto. Fachada imponente, jardins tomados pela vegetação. Interior com sinais de vandalismo.",
+    "lat": 41.1782,
+    "lon": -8.6041,
+    "photos": [
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca"
+    ],
+    "warnings": [
+      "Vidros partidos",
+      "Escadas instáveis",
+      "Vegetação densa"
+    ],
+    "accessibility": "Moderado"
+  },
+  {
+    "id": "e5f6a7b8-9c1d-4e2f-8a1b-2c3d4e5f6a7b",
+    "name": "Estação Ferroviária de S. Roque",
+    "type": "Estação Ferroviária",
+    "condition": "Ruínas",
+    "yearAbandoned": 2001,
+    "description": "Pequena estação ferroviária desativada em S. Roque da Lameira, Porto. Estrutura degradada, mas ainda reconhecível.",
+    "lat": 41.1678,
+    "lon": -8.5732,
+    "photos": [
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429"
+    ],
+    "warnings": [
+      "Risco de queda de telhado",
+      "Acesso por linha desativada"
+    ],
+    "accessibility": "Moderado"
   }
 ]
