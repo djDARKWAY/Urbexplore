@@ -1,30 +1,33 @@
-import { StyleSheet } from 'react-native';
-import { palette } from '../../palette';
+import { StyleSheet } from "react-native";
+import { getDynamicPalette } from "../../../utils/themeUtils";
 
-export const markerStyles = StyleSheet.create({
+export const markerStylesFn = (backgroundColor: string) =>
+  StyleSheet.create({
     container: {
-        width: 30,
-        height: 30,
-        backgroundColor: palette.background,
-        borderRadius: 15,
-        borderWidth: 2,
-        borderColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center'
+      width: 30,
+      height: 30,
+      backgroundColor: getDynamicPalette(backgroundColor).background,
+      borderRadius: 15,
+      borderWidth: 2,
+      borderColor: "white",
+      justifyContent: "center",
+      alignItems: "center",
     },
     icon: {
-        color: 'white',
-        fontSize: 24
-    }
-});
+      color: "white",
+      fontSize: 20,
+    },
+  });
 
 export const getMarkerIcon = (category: string) => {
-    switch (category) {
-        case 'Sanatório':
-            return 'hospital';
-        case 'Mina':
-            return 'hard-hat';
-        case "Estrada":
-            return 'road-variant';
-    }
+  switch (category) {
+    case "Sanatório":
+      return "hospital";
+    case "Mina":
+      return "hard-hat";
+    case "Estrada":
+      return "road-variant";
+    case "Moradia":
+      return "home";
+  }
 };

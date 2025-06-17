@@ -7,10 +7,12 @@ import LocationDetailsModal from "./locationDetails.modal";
 import { Ionicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { scaleBarStyles } from "../styles/layout/mapView/scaleBar.styles";
-import { markerStyles, getMarkerIcon } from "../styles/layout/mapView/marker.styles";
+import { markerStylesFn, getMarkerIcon } from "../styles/layout/mapView/marker.styles";
+import { getDynamicPalette } from "../utils/themeUtils";
 import MapTypeModal from "./appCustomization.modal";
 import { googleMapsCustom } from "../styles/layout/appCustomization/googleMapsCustom";
 import { useTheme } from "../contexts/ThemeContext";
+import CustomMarker from "../contexts/CustomMarker";
 
 interface Place {
   id: string;
@@ -32,9 +34,7 @@ interface Place {
 
 const MapViewFullScreen = () => {
   const { backgroundColor } = useTheme();
-  const dynamicPalette = {
-    background: backgroundColor,
-  };
+  const dynamicPalette = getDynamicPalette(backgroundColor);
   
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [loading, setLoading] = useState(true);
@@ -158,13 +158,11 @@ const MapViewFullScreen = () => {
       customMapStyle={mapType === 'dark' ? googleMapsCustom : []}
       >      {places.map((place) => (
         <Marker
-            key={place.id}
+            key={place.id + backgroundColor}
             coordinate={{ latitude: place.lat, longitude: place.lon }}
             onPress={() => { setSelected(place); setModalVisible(true); }}
         >
-        <View style={markerStyles.container}>
-          <MaterialCommunityIcons name={getMarkerIcon(place.category)} style={markerStyles.icon} />
-            </View>
+          <CustomMarker key={backgroundColor + place.id} backgroundColor={backgroundColor} category={place.category} />
         </Marker>
       ))}
       </MapView>
