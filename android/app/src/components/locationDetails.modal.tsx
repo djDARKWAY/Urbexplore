@@ -21,6 +21,7 @@ interface LocationDetailsModalProps {
     warnings?: string[];
     accessLevel?: string;
     rating?: number;
+    totalRate?: number;
     createdBy?: string;
     updatedAt?: string;
     lat?: number;
@@ -119,7 +120,6 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
             </View>
             {location.description && <Text style={styles.description}>{location.description}</Text>}
             
-            {/* Detalhes */}
             {location.category && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Tipo:</Text>
@@ -145,25 +145,26 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
               </View>
             )}
 
-            {/* Avaliação */}
             {location.rating !== undefined && location.rating !== null && (
               <View style={{ alignItems: 'center', marginBottom: 24 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   {[1, 2, 3, 4, 5].map((i) => {
-                  const isFull = i <= Math.floor(location.rating ?? 0);
-                  const isHalf = !isFull && i - 1 < (location.rating ?? 0) && (location.rating ?? 0) % 1 >= 0.5;
-                  return (
-                    <Ionicons
-                      key={i}
-                      name={isFull ? 'star' : isHalf ? 'star-half' : 'star-outline'}
-                      size={28}
-                      color={palette.accent}
-                      style={{ marginHorizontal: 2 }}
-                    />
-                  );
+                    const isFull = i <= Math.floor(location.rating ?? 0);
+                    const isHalf = !isFull && i - 1 < (location.rating ?? 0) && (location.rating ?? 0) % 1 >= 0.5;
+                    return (
+                      <Ionicons
+                        key={i}
+                        name={isFull ? 'star' : isHalf ? 'star-half' : 'star-outline'}
+                        size={28}
+                        color={palette.accent}
+                        style={{ marginHorizontal: 2 }}
+                      />
+                    );
                   })}
                   <Text style={{ color: palette.accent, fontSize: 16, marginLeft: 8 }}>
-                    {location.rating !== undefined && location.rating !== null ? location.rating.toFixed(1) : ''}
+                    {location.rating !== undefined && location.rating !== null
+                      ? `${location.rating.toFixed(1)}${location.totalRate !== undefined && location.totalRate !== null ? ` (${location.totalRate})` : ''}`
+                      : ''}
                   </Text>
                 </View>
               </View>
@@ -181,7 +182,6 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
               </View>
             )}
 
-            {/* Adicionado & Atualizado */}
             {(location.createdBy || location.updatedAt) && (
               <View style={{
                 flexDirection: 'row',

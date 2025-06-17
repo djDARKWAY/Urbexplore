@@ -27,6 +27,7 @@ interface Place {
   updatedAt?: string;
   lat: number;
   lon: number;
+  totalRate?: number;
 }
 
 const MapViewFullScreen = () => {
@@ -64,27 +65,37 @@ const MapViewFullScreen = () => {
           setLocation(loc);
         }
       } catch (locErr) {
-        }
+        console.log("Erro ao obter localização:", locErr);
+      }
+      console.log("A fazer fetch para http://192.168.1.79:3001/locations");
       const response = await fetch("http://192.168.1.79:3001/locations");
+      console.log("Status da resposta:", response.status);
       const data = await response.json();
-      setPlaces(data.locations.map((l: any) => ({
-        id: l._id || l.id,
-        title: l.title,
-        description: l.description,
-        images: l.images,
-        category: l.category,
-        condition: l.condition,
-        yearAbandoned: l.yearAbandoned,
-        warnings: l.warnings,
-        accessLevel: l.accessLevel,
-        rating: l.rating,
-        createdBy: l.createdBy,
-        updatedAt: l.updatedAt,
-        lat: l.lat,
-        lon: l.lon,
-      })));
+      console.log("Dados recebidos:", data);
+      setPlaces(data.locations.map((l: any) => {
+        const mapped = {
+          id: l._id || l.id,
+          title: l.title,
+          description: l.description,
+          images: l.images,
+          category: l.category,
+          condition: l.condition,
+          yearAbandoned: l.yearAbandoned,
+          warnings: l.warnings,
+          accessLevel: l.accessLevel,
+          rating: l.rating,
+          createdBy: l.createdBy,
+          updatedAt: l.updatedAt,
+          lat: l.lat,
+          lon: l.lon,
+          totalRate: l.totalRate ?? 0,
+        };
+        console.log("Local mapeado:", mapped);
+        return mapped;
+      }));
     } catch (e: any) {
       setError(e.message);
+      console.log("Erro no fetch:", e);
       Alert.alert("Erro", e.message);
     } finally {
       setLoading(false);
