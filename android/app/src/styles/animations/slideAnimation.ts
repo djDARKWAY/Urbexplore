@@ -36,12 +36,6 @@ export function animateModalGestureOut(slideAnim: Animated.Value, dragY: Animate
   animateModalOut(slideAnim, dragY, onEnd);
 }
 
-/**
- * Custom hook for slide-in animation from bottom (for modals).
- * @param visible Whether the modal is visible
- * @param duration Animation duration in ms (default: 350)
- * @param initialValue Initial Y offset (default: SCREEN_HEIGHT)
- */
 export function useSlideAnimation(visible: boolean, duration = 350, initialValue = SCREEN_HEIGHT) {
   const slideAnim = useRef(new Animated.Value(initialValue)).current;
 
