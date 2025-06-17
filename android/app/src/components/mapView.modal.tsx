@@ -7,30 +7,12 @@ import LocationDetailsModal from "./locationDetails.modal";
 import { Ionicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { scaleBarStyles } from "../styles/layout/mapView/scaleBar.styles";
-import { markerStylesFn, getMarkerIcon } from "../styles/layout/mapView/marker.styles";
 import { getDynamicPalette } from "../utils/themeUtils";
 import MapTypeModal from "./appCustomization.modal";
 import { googleMapsCustom } from "../styles/layout/appCustomization/googleMapsCustom";
 import { useTheme } from "../contexts/ThemeContext";
 import CustomMarker from "../contexts/CustomMarker";
-
-interface Place {
-  id: string;
-  title: string;
-  description?: string;
-  images?: string[];
-  category: string;
-  condition?: string;
-  yearAbandoned?: number;
-  warnings?: string[];
-  accessLevel?: string;
-  rating?: number;
-  createdBy?: string;
-  updatedAt?: string;
-  lat: number;
-  lon: number;
-  totalRate?: number;
-}
+import { Location as LocationType } from "../interfaces/Location";
 
 const MapViewFullScreen = () => {
   const { backgroundColor } = useTheme();
@@ -38,17 +20,19 @@ const MapViewFullScreen = () => {
   
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [loading, setLoading] = useState(true);
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [selected, setSelected] = useState<Place | null>(null);
+  const [places, setPlaces] = useState<LocationType[]>([]);
+  const [selected, setSelected] = useState<LocationType | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite'>('standard');
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false);
   const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 };
-  const [region, setRegion] = useState<any>(initialRegion);
+  const [currentRegion, setCurrentRegion] = useState<any>(initialRegion);
+  const [heading, setHeading] = useState(0);
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
+    setCurrentRegion(initialRegion);
     fetchData();
   }, []);
 
@@ -107,6 +91,21 @@ const MapViewFullScreen = () => {
     }
   };
 
+  const goToNorth = () => {
+    if (mapRef.current) {
+      mapRef.current.animateCamera({ heading: 0 }, { duration: 500 });
+    }
+  };
+
+  const handleRegionChangeComplete = (reg: any) => {
+    setCurrentRegion(reg);
+    if (mapRef.current) {
+      mapRef.current.getCamera().then((camera) => {
+        setHeading(camera.heading || 0);
+      });
+    }
+  };
+
   const dist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371000;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -146,25 +145,27 @@ const MapViewFullScreen = () => {
       <MapView
       ref={mapRef}
       style={mapStyles.map}
-      region={region}
-      onRegionChangeComplete={setRegion}
+      initialRegion={initialRegion}
+      onRegionChange={handleRegionChangeComplete}
       showsUserLocation={true}
       showsMyLocationButton={false}
       showsCompass={false}
       minZoomLevel={7}
       maxZoomLevel={21}
       toolbarEnabled={false}
+      rotateEnabled={true}
       mapType={mapType === 'satellite' ? 'satellite' : 'standard'}
       customMapStyle={mapType === 'dark' ? googleMapsCustom : []}
-      >      {places.map((place) => (
-        <Marker
+      >
+        {places.map(place => (
+          <Marker
             key={place.id + backgroundColor}
             coordinate={{ latitude: place.lat, longitude: place.lon }}
             onPress={() => { setSelected(place); setModalVisible(true); }}
-        >
-          <CustomMarker key={backgroundColor + place.id} backgroundColor={backgroundColor} category={place.category} />
-        </Marker>
-      ))}
+          >
+            <CustomMarker backgroundColor={backgroundColor} category={place.category} />
+          </Marker>
+        ))}
       </MapView>
       <TouchableOpacity
       style={[mapStyles.button, mapStyles.filterButton]}
@@ -178,8 +179,16 @@ const MapViewFullScreen = () => {
       >
       <Ionicons name="locate" size={32} color="#AAAAAA" />
       </TouchableOpacity>
-      {region && (() => {
-      const s = scaleBar(region, 72);
+      {heading !== 0 && (
+        <TouchableOpacity
+          style={[mapStyles.button, mapStyles.currentLocationButton, { top: 80 }]}
+          onPress={goToNorth}
+        >
+          <MaterialCommunityIcons name="compass-outline" size={32} color="#AAAAAA" />
+        </TouchableOpacity>
+      )}
+      {currentRegion && (() => {
+      const s = scaleBar(currentRegion, 72);
       return (
         <View style={scaleBarStyles.container}>
         <View style={[scaleBarStyles.bar, { width: s.width }]} />

@@ -5,13 +5,7 @@ import styles from "../styles/layout/mapView/mapModal.styles";
 import mapStyleTabStyles, { getMapBoxStyle } from "../styles/layout/appCustomization/mapStyleTab.styles"
 import colorPaletteTabStyles, { getColorCircleStyle } from "../styles/layout/appCustomization/colorPaletteTab.styles";
 import { useTheme } from "../contexts/ThemeContext";
-
-interface MapTypeModalProps {
-  visible: boolean;
-  selectedType: "standard" | "dark" | "satellite";
-  onSelect: (type: "standard" | "dark" | "satellite") => void;
-  onClose: () => void;
-}
+import { MapTypeModalProps } from "../interfaces/MapType";
 
 const MapTypeModal: React.FC<MapTypeModalProps> = ({
   visible,
@@ -24,7 +18,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
     "mapStyle"
   );
 
-  const palette = ["#14171b", "#050608", "#221013", "#16263a", "#0e3d2e", "#27163a", "#3a1627", "#3a2e16", "#263a16", "#3a2716"];
+  const palette = ["#14171b", "#050608", "#351017", "#14233a", "#0e3e30", "#21143d", "#3d1220", "#473516", "#294c14", "#473016"];
 
   const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
 

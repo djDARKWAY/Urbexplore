@@ -6,28 +6,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { getDynamicPalette } from "../utils/themeUtils";
 import { palette } from "../styles/palette";
 import { animateModalIn, animateModalOut, animateModalGestureOut, SCREEN_HEIGHT } from '../styles/animations/slideAnimation';
-
-interface LocationDetailsModalProps {
-  visible: boolean;
-  onClose: () => void;
-  location: {
-    id: string;
-    title: string;
-    description?: string;
-    images?: string[];
-    category: string;
-    condition?: string;
-    yearAbandoned?: number;
-    warnings?: string[];
-    accessLevel?: string;
-    rating?: number;
-    totalRate?: number;
-    createdBy?: string;
-    updatedAt?: string;
-    lat?: number;
-    lon?: number;
-  };
-}
+import { LocationDetailsModalProps } from "../interfaces/DetailsProps";
 
 const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
   visible,
