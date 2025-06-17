@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder, Linking, Platform } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/locationDetails/detailsModal.styles";
 import { useTheme } from "../contexts/ThemeContext";
@@ -69,6 +69,14 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
   }, [visible]);
 
   const translateY = Animated.add(slideAnim, dragY);
+
+  const openMap = (lat?: number, lon?: number) => {
+    if (Platform.OS === 'android' && lat && lon) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+      Linking.openURL(url);
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -180,7 +188,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
           </ScrollView>
 
           <View style={styles.fixedActionContainer}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => openMap(location.lat, location.lon)}>
               <Ionicons name="navigate" size={24} color="#fff" />
               <Text style={styles.actionText}>Navegar</Text>
             </TouchableOpacity>

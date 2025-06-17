@@ -181,7 +181,7 @@ const MapViewFullScreen = () => {
       </TouchableOpacity>
       {heading !== 0 && (
         <TouchableOpacity
-          style={[mapStyles.button, mapStyles.currentLocationButton, { top: 80 }]}
+          style={[mapStyles.button, mapStyles.compassButton]}
           onPress={goToNorth}
         >
           <MaterialCommunityIcons name="compass-outline" size={32} color="#AAAAAA" />

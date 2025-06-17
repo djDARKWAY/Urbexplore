@@ -7,8 +7,7 @@ export const mapStyles = StyleSheet.create({
     backgroundColor: palette.background,
   },
   map: {
-    width: "100%",
-    height: "100%",
+    flex: 1,
   },
   button: {
     position: "absolute",
@@ -36,5 +35,20 @@ export const mapStyles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
+  },
+  compassButton: {
+    bottom: 210,
+    right: 37,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: palette.background,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: palette.border,
   },
 });
