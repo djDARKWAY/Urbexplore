@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, View, Text, TouchableOpacity, Animated, Easing } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/darkTheme/mapModal.styles";
+import styles from "../styles/mapModal.styles";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface MapTypeModalProps {
   visible: boolean;
@@ -16,10 +17,20 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
   onSelect,
   onClose,
 }) => {
+  const { backgroundColor, setBackgroundColor } = useTheme();
   const [activeTab, setActiveTab] = useState<"mapStyle" | "colorPalette">(
     "mapStyle"
   );
   const slideAnim = useRef(new Animated.Value(300)).current;
+
+  const palette = ["#14171b", "#050608", "#221013", "#16263a", "#0e3d2e", "#27163a", "#3a1627", "#3a2e16", "#263a16", "#3a2716"];
+
+  const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
+
+  useEffect(() => {
+    if (visible) {
+    }
+  }, [visible, backgroundColor]);
 
   useEffect(() => {
     if (visible) {
@@ -34,6 +45,9 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
     }
   }, [visible]);
 
+  const getModalBackground = () => {
+    return { backgroundColor };
+  };
   return (
     <Modal
       visible={visible}
@@ -42,24 +56,21 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <Animated.View style={[styles.modalContainer, { transform: [{ translateY: slideAnim }] }]}> 
-          {/* Botão de fechar */}
+        <Animated.View style={[styles.modalContainer, getModalBackground(), { transform: [{ translateY: slideAnim }] }]}>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onClose}
           >
             <Ionicons name="close" size={28} color="#fff" />
           </TouchableOpacity>
-          {/* Título */}
           <Text style={styles.title}>
             Personalização
           </Text>
-          {/* Tabs */}
           <View style={styles.tabsContainer}>
             <TouchableOpacity
               style={[
-                styles.tab, 
-                styles.tabLeft, 
+                styles.tab,
+                styles.tabLeft,
                 activeTab === "mapStyle" ? styles.activeTabBorder : styles.inactiveTabBorder
               ]}
               onPress={() => setActiveTab("mapStyle")}
@@ -75,7 +86,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
             </TouchableOpacity>
             <TouchableOpacity
               style={[
-                styles.tab, 
+                styles.tab,
                 activeTab === "colorPalette" ? styles.activeTabBorder : styles.inactiveTabBorder
               ]}
               onPress={() => setActiveTab("colorPalette")}
@@ -90,7 +101,6 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               </Text>
             </TouchableOpacity>
           </View>
-          {/* Tab Content */}
           {activeTab === "mapStyle" ? (
             <View
               style={{
@@ -100,7 +110,6 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                 marginTop: 24,
               }}
             >
-              {/* Preview Standard */}
               <TouchableOpacity
                 style={{ alignItems: "center", flex: 1, marginRight: 4 }}
                 onPress={() => {
@@ -128,7 +137,6 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                 </View>
                 <Text style={{ color: "#fff" }}>Claro</Text>
               </TouchableOpacity>
-              {/* Preview Dark */}
               <TouchableOpacity
                 style={{ alignItems: "center", flex: 1, marginHorizontal: 4 }}
                 onPress={() => {
@@ -155,7 +163,6 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                 </View>
                 <Text style={{ color: "#fff" }}>Escuro</Text>
               </TouchableOpacity>
-              {/* Preview Satellite */}
               <TouchableOpacity
                 style={{ alignItems: "center", flex: 1, marginLeft: 4 }}
                 onPress={() => {
@@ -185,15 +192,39 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               </TouchableOpacity>
             </View>
           ) : (
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                flex: 1,
-              }}
-            >
-              <Text style={{ color: "#fff", fontSize: 16 }}>
-                Seleção de cores em breve...
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 16 }}>
+                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Cor do tema</Text>
+              </View>
+              {paletteRows.map((row, rowIndex) => (
+                <View key={rowIndex} style={{ flexDirection: 'row', justifyContent: 'center', marginTop: rowIndex === 0 ? 24 : 12 }}>
+                  {row.map((color) => (
+                    <TouchableOpacity
+                      key={color}
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        backgroundColor: color,
+                        marginHorizontal: 8,
+                        borderWidth: backgroundColor === color ? 3 : 1,
+                        borderColor: backgroundColor === color ? '#4CE0B3' : '#888',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      onPress={() => {
+                        setBackgroundColor(color);
+                      }}
+                    >
+                      {backgroundColor === color && (
+                        <Ionicons name="checkmark" size={24} color="#fff" />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ))}
+              <Text style={{ color: '#fff', textAlign: 'center', marginTop: 18 }}>
+                Escolha uma cor para a interface
               </Text>
             </View>
           )}

@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, Alert, TouchableOpacity, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { mapStyles } from "../styles/darkTheme/map.styles";
+import { mapStyles } from "../styles/map.styles";
 import LocationDetailsModal from "./LocationDetailsModal";
 import { Ionicons } from '@expo/vector-icons';
-import { scaleBarStyles } from "../styles/darkTheme/scaleBar.styles";
+import { scaleBarStyles } from "../styles/scaleBar.styles";
 import MapTypeModal from "./MapTypeModal";
-import { googleMapsDarkStyle } from "../styles/darkTheme/googleMapsDarkStyle";
+import { googleMapsDarkStyle } from "../styles/googleMapsDarkStyle";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface Place {
   id: string;
@@ -26,7 +27,16 @@ interface Place {
   lon: number;
 }
 
+const getDynamicPalette = (backgroundColor: string) => {
+  return {
+    background: backgroundColor,
+  };
+};
+
 const MapViewFullScreen = () => {
+  const { backgroundColor } = useTheme();
+  const dynamicPalette = getDynamicPalette(backgroundColor);
+  
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [loading, setLoading] = useState(true);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -113,10 +123,9 @@ const MapViewFullScreen = () => {
     else { val = Math.round(d/10)*10; }
     return { label: `${val} ${unit}`, width: w };
   };
-
   if (loading) {
     return (
-      <View style={mapStyles.container}>
+      <View style={[mapStyles.container, { backgroundColor: dynamicPalette.background }]}>
         <ActivityIndicator size="large" color="#0000ff" />
         {error && (
           <View style={{ marginTop: 20 }}>
@@ -129,9 +138,8 @@ const MapViewFullScreen = () => {
       </View>
     );
   }
-
   return (
-    <View style={mapStyles.container}>
+    <View style={[mapStyles.container, { backgroundColor: dynamicPalette.background }]}>
       <MapView
       ref={mapRef}
       style={mapStyles.map}

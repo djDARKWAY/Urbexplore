@@ -1,8 +1,10 @@
 import React, { useRef, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, Easing, PanResponder, GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/darkTheme/detailsModal.styles";
-import { palette } from "../styles/darkTheme/palette";
+import styles from "../styles/detailsModal.styles";
+import { useTheme } from "../contexts/ThemeContext";
+import { getDynamicPalette } from "../utils/themeUtils";
+import { palette } from "../styles/palette";
 
 interface LocationDetailsModalProps {
   visible: boolean;
@@ -30,15 +32,27 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
   onClose,
   location,
 }) => {
+  const { backgroundColor } = useTheme();
+  const dynamicPalette = getDynamicPalette(backgroundColor);
   const slideAnim = useRef(new Animated.Value(300)).current;
   const dragY = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
-  // PanResponder para arrastar o modal
+
+  const closeWithAnimation = () => {
+    Animated.timing(slideAnim, {
+      toValue: 300,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      dragY.setValue(0);
+      onClose();
+    });
+  };
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        // Só responde a gestos verticais para baixo
         return gestureState.dy > 10 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx);
       },
       onPanResponderGrant: () => {
@@ -53,18 +67,9 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
       onPanResponderRelease: (_, gestureState) => {
         dragY.flattenOffset();
         lastOffset.current = 0;
-        // Se arrastou mais de 120px ou soltou com velocidade > 1.5, fecha
         if (gestureState.dy > 120 || gestureState.vy > 1.5) {
-          Animated.timing(slideAnim, {
-            toValue: 300,
-            duration: 200,
-            useNativeDriver: true,
-          }).start(() => {
-            dragY.setValue(0);
-            onClose();
-          });
+          closeWithAnimation();
         } else {
-          // Volta para posição original
           Animated.spring(dragY, {
             toValue: 0,
             useNativeDriver: true,
@@ -76,20 +81,20 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
 
   useEffect(() => {
     if (visible) {
+      slideAnim.setValue(300);
+      dragY.setValue(0);
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 350,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start();
-      dragY.setValue(0);
     } else {
       slideAnim.setValue(300);
       dragY.setValue(0);
     }
   }, [visible]);
 
-  // Combina a animação de slide inicial com o drag
   const translateY = Animated.add(slideAnim, dragY);
   return (
     <Modal
@@ -98,17 +103,19 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer}>
+      <View style={styles.modalContainer}> 
         <Animated.View
-          style={[styles.modalContent, { transform: [{ translateY }] }]}
+          style={[styles.modalContent, { backgroundColor: dynamicPalette.background, transform: [{ translateY }] }]}
         >
           <Animated.View style={styles.imageContainer} {...panResponder.panHandlers}>
-            <Image
-              source={{ uri: location.images && location.images.length > 0 ? location.images[0] : undefined }}
-              style={styles.image}
-              resizeMode="cover"
-            />
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            {location.images && location.images.length > 0 && location.images[0] ? (
+              <Image
+                source={{ uri: location.images[0] }}
+                style={styles.image}
+                resizeMode="cover"
+              />
+            ) : null}
+            <TouchableOpacity style={styles.closeButton} onPress={closeWithAnimation}>
               <Ionicons name="close" size={20} color="#fff" />
             </TouchableOpacity>
           </Animated.View>
@@ -119,7 +126,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
             </View>
             {location.description && <Text style={styles.description}>{location.description}</Text>}
             
-            {/* dETALHES */}
+            {/* Detalhes */}
             {location.category && (
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Tipo:</Text>
@@ -145,32 +152,27 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
               </View>
             )}
 
-            {/* Avaliação  */}
+            {/* Avaliação */}
             {location.rating !== undefined && location.rating !== null && (
-              <View style={{ flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                {[1,2,3,4,5].map((i) => (
-                <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons
-                  name={
-                    i <= Math.floor(location.rating ?? 0)
-                    ? 'star'
-                    : (i - 1 < (location.rating ?? 0) && (location.rating ?? 0) % 1 >= 0.5
-                      ? 'star-half'
-                      : 'star-outline')
-                  }
-                  size={32}
-                  color={palette.accent}
-                  style={{ marginHorizontal: 2 }}
-                  />
-                  {i === Math.ceil(location.rating ?? 0) && (
-                  <Text style={{ color: palette.accent, fontSize: 16, marginLeft: 4 }}>
-                    {location.rating?.toFixed(1)}
+              <View style={{ alignItems: 'center', marginBottom: 24 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  {[1, 2, 3, 4, 5].map((i) => {
+                  const isFull = i <= Math.floor(location.rating ?? 0);
+                  const isHalf = !isFull && i - 1 < (location.rating ?? 0) && (location.rating ?? 0) % 1 >= 0.5;
+                  return (
+                    <Ionicons
+                      key={i}
+                      name={isFull ? 'star' : isHalf ? 'star-half' : 'star-outline'}
+                      size={28}
+                      color={palette.accent}
+                      style={{ marginHorizontal: 2 }}
+                    />
+                  );
+                  })}
+                  <Text style={{ color: palette.accent, fontSize: 16, marginLeft: 8 }}>
+                    {location.rating !== undefined && location.rating !== null ? location.rating.toFixed(1) : ''}
                   </Text>
-                  )}
                 </View>
-                ))}
-              </View>
               </View>
             )}
 
@@ -196,7 +198,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
                 width: '100%',
               }}>
                 <Text style={{ color: palette.subtleText, fontSize: 13, textAlign: 'left', flex: 2 }} numberOfLines={1} ellipsizeMode="tail">
-                  {location.createdBy ? location.createdBy : ''}
+                  {location.createdBy ? String(location.createdBy) : ''}
                 </Text>
                 <Text style={{ color: palette.subtleText, fontSize: 13, textAlign: 'right', flex: 1 }} numberOfLines={1} ellipsizeMode="tail">
                   {location.updatedAt ? new Date(location.updatedAt).toLocaleDateString() : ''}
