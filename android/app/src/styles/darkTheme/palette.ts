@@ -3,6 +3,7 @@ export const palette = {
     border: "#2A3238",
     text: "#E5E5E5",
     mutedText: "#B8B8B8",
+    subtleText: "#666666",
     accent: "#7CA6C7",
     warning: "#C2A469",
     badgeEasy: "#7A9C7A",

@@ -11,16 +11,19 @@ import { googleMapsDarkStyle } from "../styles/darkTheme/googleMapsDarkStyle";
 
 interface Place {
   id: string;
-  name: string;
-  description: string;
-  coordinate: { latitude: number; longitude: number };
-  imageUrl: string;
-  difficulty?: string;
-  type?: string;
+  title: string;
+  description?: string;
+  images?: string[];
+  category: string;
   condition?: string;
   yearAbandoned?: number;
   warnings?: string[];
-  accessibility?: string;
+  accessLevel?: string;
+  rating?: number;
+  createdBy?: string;
+  updatedAt?: string;
+  lat: number;
+  lon: number;
 }
 
 const MapViewFullScreen = () => {
@@ -54,20 +57,23 @@ const MapViewFullScreen = () => {
         }
       } catch (locErr) {
         }
-      const response = await fetch("http://192.168.1.95:3001/locations");
+      const response = await fetch("http://192.168.1.79:3001/locations");
       const data = await response.json();
       setPlaces(data.locations.map((l: any) => ({
         id: l._id || l.id,
-        name: l.name,
+        title: l.title,
         description: l.description,
-        coordinate: { latitude: l.lat, longitude: l.lon },
-        imageUrl: l.photos?.[0],
-        difficulty: l.difficulty,
-        type: l.type,
+        images: l.images,
+        category: l.category,
         condition: l.condition,
         yearAbandoned: l.yearAbandoned,
         warnings: l.warnings,
-        accessibility: l.accessibility,
+        accessLevel: l.accessLevel,
+        rating: l.rating,
+        createdBy: l.createdBy,
+        updatedAt: l.updatedAt,
+        lat: l.lat,
+        lon: l.lon,
       })));
     } catch (e: any) {
       setError(e.message);
@@ -143,7 +149,7 @@ const MapViewFullScreen = () => {
       {places.map((place) => (
         <Marker
         key={place.id}
-        coordinate={place.coordinate}
+        coordinate={{ latitude: place.lat, longitude: place.lon }}
         pinColor="#F44336"
         onPress={() => { setSelected(place); setModalVisible(true); }}
         />
