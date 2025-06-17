@@ -1,10 +1,11 @@
 import React, { useRef, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, Easing, PanResponder, GestureResponderEvent, PanResponderGestureState } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/detailsModal.styles";
+import styles from "../styles/colors/detailsModal.styles";
 import { useTheme } from "../contexts/ThemeContext";
 import { getDynamicPalette } from "../utils/themeUtils";
 import { palette } from "../styles/palette";
+import { animateModalIn, animateModalOut, animateModalGestureOut, SCREEN_HEIGHT } from '../styles/animations/slideAnimation';
 
 interface LocationDetailsModalProps {
   visible: boolean;
@@ -34,16 +35,12 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
 }) => {
   const { backgroundColor } = useTheme();
   const dynamicPalette = getDynamicPalette(backgroundColor);
-  const slideAnim = useRef(new Animated.Value(300)).current;
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const dragY = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
 
   const closeWithAnimation = () => {
-    Animated.timing(slideAnim, {
-      toValue: 300,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {
+    animateModalOut(slideAnim, dragY, () => {
       dragY.setValue(0);
       onClose();
     });
@@ -68,7 +65,10 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
         dragY.flattenOffset();
         lastOffset.current = 0;
         if (gestureState.dy > 120 || gestureState.vy > 1.5) {
-          closeWithAnimation();
+          animateModalGestureOut(slideAnim, dragY, () => {
+            dragY.setValue(0);
+            onClose();
+          });
         } else {
           Animated.spring(dragY, {
             toValue: 0,
@@ -81,16 +81,9 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
 
   useEffect(() => {
     if (visible) {
-      slideAnim.setValue(300);
-      dragY.setValue(0);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 350,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }).start();
+      animateModalIn(slideAnim, dragY).start();
     } else {
-      slideAnim.setValue(300);
+      slideAnim.setValue(SCREEN_HEIGHT);
       dragY.setValue(0);
     }
   }, [visible]);
@@ -211,11 +204,6 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons name="navigate" size={24} color="#fff" />
               <Text style={styles.actionText}>Navegar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.actionButton}>
-              <Ionicons name="bookmark" size={24} color="#fff" />
-              <Text style={styles.actionText}>Guardar</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.actionButton}>

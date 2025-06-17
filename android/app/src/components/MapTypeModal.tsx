@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, View, Text, TouchableOpacity, Animated, Easing } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/mapModal.styles";
+import styles from "../styles/colors/mapModal.styles";
 import { useTheme } from "../contexts/ThemeContext";
 
 interface MapTypeModalProps {

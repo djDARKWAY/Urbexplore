@@ -12,7 +12,7 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [backgroundColor, setBackgroundColor] = useState<string>('#181C20'); // cor padrão
+  const [backgroundColor, setBackgroundColor] = useState<string>('#181C20');
 
   return (
     <ThemeContext.Provider
