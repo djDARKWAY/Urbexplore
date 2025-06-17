@@ -57,45 +57,39 @@ const MapViewFullScreen = () => {
     setError(null);
     try {
       let loc = null;
-      try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === "granted") {
-          let lastLoc = await Location.getLastKnownPositionAsync();
-          loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
-          setLocation(loc);
-        }
-      } catch (locErr) {
-        console.log("Erro ao obter localização:", locErr);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        let lastLoc = await Location.getLastKnownPositionAsync();
+        loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
+        setLocation(loc);
       }
-      console.log("A fazer fetch para http://192.168.1.79:3001/locations");
+
       const response = await fetch("http://192.168.1.79:3001/locations");
-      console.log("Status da resposta:", response.status);
       const data = await response.json();
-      console.log("Dados recebidos:", data);
       setPlaces(data.locations.map((l: any) => {
         const mapped = {
-          id: l._id || l.id,
-          title: l.title,
-          description: l.description,
-          images: l.images,
-          category: l.category,
-          condition: l.condition,
-          yearAbandoned: l.yearAbandoned,
-          warnings: l.warnings,
-          accessLevel: l.accessLevel,
-          rating: l.rating,
-          createdBy: l.createdBy,
-          updatedAt: l.updatedAt,
-          lat: l.lat,
-          lon: l.lon,
+          id: l._id || l.id || '',
+          title: l.title || '-',
+          description: l.description || '-',
+          images: l.images && l.images.length > 0
+            ? l.images
+            : ['https://placehold.co/600x400/1e1e1e/FFFFFF/png?text=Sem+Imagem&font=Poppins&fontsize=28&outline=true'],
+          category: l.category || '-',
+          condition: l.condition || '-',
+          yearAbandoned: l.yearAbandoned ?? null,
+          warnings: l.warnings && l.warnings.length > 0 ? l.warnings : [],
+          accessLevel: l.accessLevel || '-',
+          rating: l.rating ?? 0,
+          createdBy: l.createdBy || '-',
+          updatedAt: l.updatedAt || '-',
+          lat: l.lat ?? 0,
+          lon: l.lon ?? 0,
           totalRate: l.totalRate ?? 0,
         };
-        console.log("Local mapeado:", mapped);
         return mapped;
       }));
     } catch (e: any) {
       setError(e.message);
-      console.log("Erro no fetch:", e);
       Alert.alert("Erro", e.message);
     } finally {
       setLoading(false);

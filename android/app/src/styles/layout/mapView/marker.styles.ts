@@ -22,5 +22,9 @@ export const getMarkerIcon = (category: string) => {
     switch (category) {
         case 'Sanatório':
             return 'hospital';
+        case 'Mina':
+            return 'hard-hat';
+        case "Estrada":
+            return 'road-variant';
     }
 };
