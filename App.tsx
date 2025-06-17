@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import MapViewFullScreen from './android/app/src/components/MapViewFullScreen';
+import MapViewFullScreen from './android/app/src/components/mapView.modal';
 import { ThemeProvider } from './android/app/src/contexts/ThemeContext';
 
 export default function App() {

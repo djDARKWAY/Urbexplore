@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/colors/detailsModal.styles";
+import styles from "../styles/layout/locationDetails/detailsModal.styles";
 import { useTheme } from "../contexts/ThemeContext";
 import { getDynamicPalette } from "../utils/themeUtils";
 import { palette } from "../styles/palette";

@@ -1,4 +1,5 @@
 import { Animated, Easing, Dimensions } from 'react-native';
+import { useRef, useEffect } from "react";
 
 export const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -33,4 +34,29 @@ export function animateModalOut(slideAnim: Animated.Value, dragY: Animated.Value
 
 export function animateModalGestureOut(slideAnim: Animated.Value, dragY: Animated.Value, onEnd?: () => void) {
   animateModalOut(slideAnim, dragY, onEnd);
+}
+
+/**
+ * Custom hook for slide-in animation from bottom (for modals).
+ * @param visible Whether the modal is visible
+ * @param duration Animation duration in ms (default: 350)
+ * @param initialValue Initial Y offset (default: SCREEN_HEIGHT)
+ */
+export function useSlideAnimation(visible: boolean, duration = 350, initialValue = SCREEN_HEIGHT) {
+  const slideAnim = useRef(new Animated.Value(initialValue)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      slideAnim.setValue(initialValue);
+    }
+  }, [visible, duration, initialValue, slideAnim]);
+
+  return slideAnim;
 }

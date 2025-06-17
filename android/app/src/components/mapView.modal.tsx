@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, Alert, TouchableOpacity, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { mapStyles } from "../styles/colors/map.styles";
-import LocationDetailsModal from "./LocationDetailsModal";
+import { mapStyles } from "../styles/layout/mapView/map.styles";
+import LocationDetailsModal from "./locationDetails.modal";
 import { Ionicons } from '@expo/vector-icons';
-import { scaleBarStyles } from "../styles/colors/scaleBar.styles";
-import MapTypeModal from "./MapTypeModal";
-import { googleMapsDarkStyle } from "../styles/colors/googleMapsDarkStyle";
+import { scaleBarStyles } from "../styles/layout/mapView/scaleBar.styles";
+import MapTypeModal from "./appCustomization.modal";
+import { googleMapsDarkStyle } from "../styles/layout/appCustomization/googleMapsCustom";
 import { useTheme } from "../contexts/ThemeContext";
 
 interface Place {

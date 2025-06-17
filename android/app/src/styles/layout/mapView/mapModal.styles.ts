@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { palette } from "../palette";
+import { palette } from "../../palette";
 
 const styles = StyleSheet.create({
   modalOverlay: {

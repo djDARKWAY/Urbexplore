@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { palette } from "../palette";
+import { palette } from "../../palette";
 
 export const scaleBarStyles = StyleSheet.create({
   container: {
