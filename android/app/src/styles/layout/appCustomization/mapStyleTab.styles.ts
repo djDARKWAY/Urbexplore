@@ -23,18 +23,21 @@ const mapStyleTabStyles = StyleSheet.create({
   label: {
     color: "#fff",
   },
+  mapBox: {
+    width: 74,
+    height: 74,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+    borderWidth: 2,
+  },
 });
 
-export const getMapBoxStyle = (selected: boolean, color: string) => ({
-  width: 90,
-  height: 90,
-  borderRadius: 18,
-  borderWidth: selected ? 3 : 1,
-  borderColor: selected ? "#4CE0B3" : "#444",
-  backgroundColor: color,
-  justifyContent: "center" as const,
-  alignItems: "center" as const,
-  marginBottom: 8,
+export const getMapBoxStyle = (selected: boolean, borderColor: string) => ({
+  ...mapStyleTabStyles.mapBox,
+  borderColor: selected ? borderColor : "#444",
+  opacity: selected ? 1 : 0.7,
 });
 
 export const getMapBoxTextStyle = (color: string) => ({

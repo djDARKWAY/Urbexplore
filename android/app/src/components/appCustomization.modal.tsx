@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { Modal, View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/mapView/mapModal.styles";
-import mapStyleTabStyles, { getMapBoxStyle, getMapBoxTextStyle } from "../styles/layout/mapView/mapStyleTab.styles";
+import mapStyleTabStyles, { getMapBoxStyle } from "../styles/layout/appCustomization/mapStyleTab.styles"
 import colorPaletteTabStyles, { getColorCircleStyle } from "../styles/layout/appCustomization/colorPaletteTab.styles";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -96,7 +96,11 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                 <View
                   style={getMapBoxStyle(selectedType === "standard", "#e5e5e5")}
                 >
-                  <Text style={getMapBoxTextStyle("#222")}>Claro</Text>
+                  <Image
+                    source={require("../../../../assets/appCustomization/mapsL.png")}
+                    style={{ width: 70, height: 70, borderRadius: 8 }}
+                    resizeMode="cover"
+                  />
                 </View>
                 <Text style={mapStyleTabStyles.label}>Claro</Text>
               </TouchableOpacity>
@@ -110,7 +114,11 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                 <View
                   style={getMapBoxStyle(selectedType === "dark", "#222")}
                 >
-                  <Text style={getMapBoxTextStyle("#fff")}>Escuro</Text>
+                  <Image
+                    source={require("../../../../assets/appCustomization/mapsD.png")}
+                    style={{ width: 70, height: 70, borderRadius: 8 }}
+                    resizeMode="cover"
+                  />
                 </View>
                 <Text style={mapStyleTabStyles.label}>Escuro</Text>
               </TouchableOpacity>
@@ -124,8 +132,11 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                 <View
                   style={getMapBoxStyle(selectedType === "satellite", "#b0b0b0")}
                 >
-                  <Ionicons name="globe-outline" size={32} color="#222" />
-                  <Text style={[getMapBoxTextStyle("#222"), { marginTop: 4 }]}>Satélite</Text>
+                  <Image
+                    source={require("../../../../assets/appCustomization/mapsS.png")}
+                    style={{ width: 70, height: 70, borderRadius: 8 }}
+                    resizeMode="cover"
+                  />
                 </View>
                 <Text style={mapStyleTabStyles.label}>Satélite</Text>
               </TouchableOpacity>

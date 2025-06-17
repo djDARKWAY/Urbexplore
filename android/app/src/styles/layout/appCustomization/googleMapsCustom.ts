@@ -1,4 +1,4 @@
-export const googleMapsDarkStyle = [
+export const googleMapsCustom = [
   { elementType: 'geometry', stylers: [{ color: '#212121' }] },
   { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
   { elementType: 'labels.text.fill', stylers: [{ color: '#757575' }] },

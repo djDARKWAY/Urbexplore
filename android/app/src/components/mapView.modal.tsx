@@ -5,9 +5,11 @@ import * as Location from "expo-location";
 import { mapStyles } from "../styles/layout/mapView/map.styles";
 import LocationDetailsModal from "./locationDetails.modal";
 import { Ionicons } from '@expo/vector-icons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { scaleBarStyles } from "../styles/layout/mapView/scaleBar.styles";
+import { markerStyles, getMarkerIcon } from "../styles/layout/mapView/marker.styles";
 import MapTypeModal from "./appCustomization.modal";
-import { googleMapsDarkStyle } from "../styles/layout/appCustomization/googleMapsCustom";
+import { googleMapsCustom } from "../styles/layout/appCustomization/googleMapsCustom";
 import { useTheme } from "../contexts/ThemeContext";
 
 interface Place {
@@ -27,15 +29,11 @@ interface Place {
   lon: number;
 }
 
-const getDynamicPalette = (backgroundColor: string) => {
-  return {
-    background: backgroundColor,
-  };
-};
-
 const MapViewFullScreen = () => {
   const { backgroundColor } = useTheme();
-  const dynamicPalette = getDynamicPalette(backgroundColor);
+  const dynamicPalette = {
+    background: backgroundColor,
+  };
   
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [loading, setLoading] = useState(true);
@@ -139,7 +137,7 @@ const MapViewFullScreen = () => {
     );
   }
   return (
-    <View style={[mapStyles.container, { backgroundColor: dynamicPalette.background }]}>
+    <View style={[mapStyles.container, { backgroundColor: dynamicPalette.background }]}> 
       <MapView
       ref={mapRef}
       style={mapStyles.map}
@@ -152,15 +150,17 @@ const MapViewFullScreen = () => {
       maxZoomLevel={21}
       toolbarEnabled={false}
       mapType={mapType === 'satellite' ? 'satellite' : 'standard'}
-      customMapStyle={mapType === 'dark' ? googleMapsDarkStyle : []}
-      >
-      {places.map((place) => (
+      customMapStyle={mapType === 'dark' ? googleMapsCustom : []}
+      >      {places.map((place) => (
         <Marker
-        key={place.id}
-        coordinate={{ latitude: place.lat, longitude: place.lon }}
-        pinColor="#F44336"
-        onPress={() => { setSelected(place); setModalVisible(true); }}
-        />
+            key={place.id}
+            coordinate={{ latitude: place.lat, longitude: place.lon }}
+            onPress={() => { setSelected(place); setModalVisible(true); }}
+        >
+        <View style={markerStyles.container}>
+          <MaterialCommunityIcons name={getMarkerIcon(place.category)} style={markerStyles.icon} />
+            </View>
+        </Marker>
       ))}
       </MapView>
       <TouchableOpacity
