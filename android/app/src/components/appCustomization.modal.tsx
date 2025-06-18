@@ -7,6 +7,10 @@ import colorPaletteTabStyles, { getColorCircleStyle } from "../styles/layout/app
 import { useTheme } from "../contexts/ThemeContext";
 import { MapTypeModalProps } from "../interfaces/MapType";
 
+const palette = ["#121519","#040507","#320e15","#122035","#0d392b","#1f1238","#390f1d","#413013","#254610","#412b13"];
+const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
+const defaultColor = palette[2];
+
 const MapTypeModal: React.FC<MapTypeModalProps> = ({
   visible,
   selectedType,
@@ -18,8 +22,11 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
     "mapStyle"
   );
 
-  const palette = ["#121519","#040507","#320e15","#122035","#0d392b","#1f1238","#390f1d","#413013","#254610","#412b13"];
-  const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
+  React.useEffect(() => {
+    if (!backgroundColor || !palette.includes(backgroundColor)) {
+      setBackgroundColor(defaultColor);
+    }
+  }, []);
 
   return (
     <Modal

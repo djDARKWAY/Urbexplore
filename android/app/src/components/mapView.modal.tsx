@@ -70,8 +70,6 @@ const MapViewFullScreen = () => {
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
 
-      console.log('Fazendo request para região:', { minLat, maxLat, minLon, maxLon });
-
       const apiResponse = await fetch(
         `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`
       ).then(res => res.json());
