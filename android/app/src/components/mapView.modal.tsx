@@ -18,28 +18,23 @@ import MapTypeModal from "./appCustomization.modal";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MapViewFullScreen = () => {
-  // Cor de fundo do tema
   const { backgroundColor } = useTheme();
   const dynamicPalette = getDynamicPalette(backgroundColor);
   
   // Estados principais
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null); // Localização do utilizador
-  const [loading, setLoading] = useState(true); // Carregamento
-  const [places, setPlaces] = useState<LocationType[]>([]); // Locais da API
-  const [selected, setSelected] = useState<LocationType | null>(null); // Local selecionado
-  const [modalVisible, setModalVisible] = useState(false); // Modal de detalhes
-  const [, setError] = useState<string | null>(null); // Erro
-  const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite'>('standard'); // Tipo de mapa
-  const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false); // Modal tipo de mapa
-  const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }; // Região inicial
-  const [currentRegion, setCurrentRegion] = useState<typeof initialRegion>(initialRegion); // Região atual
-  const [heading, setHeading] = useState(0); // Direção
-  const mapRef = useRef<MapView>(null); // Referência do mapa
-
-  // Ao montar, carrega dados iniciais
-  useEffect(() => {
-    fetchData(currentRegion);
-  }, []);
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [places, setPlaces] = useState<LocationType[]>([])
+  const [selected, setSelected] = useState<LocationType | null>(null)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [, setError] = useState<string | null>(null)
+  const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite'>('standard')
+  const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false)
+  const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }
+  const [currentRegion, setCurrentRegion] = useState<typeof initialRegion>(initialRegion)
+  const [heading, setHeading] = useState(0)
+  const mapRef = useRef<MapView>(null)
+  const [initialLoading, setInitialLoading] = useState(true)
 
   // Mapeia dados da API para o formato esperado
   const mapLocationData = (l: any): LocationType => ({
@@ -63,18 +58,17 @@ const MapViewFullScreen = () => {
   });
 
   // Atualiza fetchData para aceitar bounds
-  const fetchData = useCallback(async (region = currentRegion) => {
+  const fetchData = useCallback(async (region = currentRegion, isInitial = false) => {
     if (!region) return;
-    // Só mostra loading no carregamento inicial
-    if (places.length === 0) setLoading(true);
+    if (isInitial) setInitialLoading(true);
     setError(null);
     try {
-      // Calcula limites do mapa
+      // Obtém locais filtrando por coordenadas (cantos do ecrã)
       const minLat = region.latitude - region.latitudeDelta / 2;
       const maxLat = region.latitude + region.latitudeDelta / 2;
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
-      // Busca locais apenas dentro dos limites
+
       const apiResponse = await fetch(
         `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`
       ).then(res => res.json());
@@ -83,9 +77,14 @@ const MapViewFullScreen = () => {
       setError(e.message);
       Alert.alert("Erro", e.message);
     } finally {
-      setLoading(false);
+      if (isInitial) setInitialLoading(false);
     }
-  }, [currentRegion, places.length]);
+  }, [currentRegion]);
+
+  // Load inicial da localização e locais
+  useEffect(() => {
+    fetchData(currentRegion, true);
+  }, []);
 
   // Centra o mapa na localização do utilizador
   const goToUserLocation = useCallback(() => {
@@ -106,7 +105,7 @@ const MapViewFullScreen = () => {
     }
   }, []);
 
-  // Atualiza região e busca locais ao mover/zoom
+  // Atualiza região e pesquisa locais
   const handleRegionChange = useCallback((reg: typeof initialRegion) => {
     setCurrentRegion(reg);
     if (mapRef.current) {
@@ -117,7 +116,7 @@ const MapViewFullScreen = () => {
     fetchData(reg);
   }, [fetchData]);
 
-  // Calcula distância entre dois pontos (metros)
+  // Calcula distância entre dois pontos
   const dist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371000;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -126,7 +125,7 @@ const MapViewFullScreen = () => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   };
 
-  // Valor "redondo" para escala
+  // Valor para escala
   const getScale = (d: number) => {
     const niceValues = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000];
     for (let i = 0; i < niceValues.length; i++) {
@@ -152,7 +151,7 @@ const MapViewFullScreen = () => {
     return { label: `${val} ${unit}`, width };
   }, []);
 
-  // Barra de navegação inferior simples
+  // Barra de navegação inferior
   const MapTabBar = ({ activeTab = 'map' }: { activeTab: string }) => {
     const insets = useSafeAreaInsets();
     const tabs = [
@@ -186,15 +185,15 @@ const MapViewFullScreen = () => {
     );
   };
 
-  // Carregamento manual das fontes dos ícones
+  // Carregamento das fontes dos ícones
   const [fontsLoaded] = useFonts({
     'MaterialCommunityIcons': require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf'),
     'Entypo': require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Entypo.ttf'),
     'Ionicons': require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf'),
   });
 
-  // Mostra loading enquanto carrega
-  if (loading || !fontsLoaded) {
+  // Mostra loading apenas no arranque
+  if (initialLoading || !fontsLoaded) {
     return <LoadingScreen />;
   }
   
@@ -204,8 +203,8 @@ const MapViewFullScreen = () => {
       <MapView
         ref={mapRef}
         style={mapStyles.map}
-        initialRegion={initialRegion}
-        onRegionChangeComplete={handleRegionChange} // Troca para evitar múltiplos loadings
+        region={currentRegion}
+        onRegionChangeComplete={handleRegionChange}
         showsUserLocation={true}
         showsMyLocationButton={false}
         showsCompass={false}
@@ -252,7 +251,7 @@ const MapViewFullScreen = () => {
         <Ionicons name="locate" size={32} color="#AAAAAA" />
       </TouchableOpacity>
 
-      {/* Botão bússola, só aparece se o mapa estiver rodado */}
+      {/* Botão bússola*/}
       {heading !== 0 && (
         <TouchableOpacity
           style={[mapStyles.compassButton]}
