@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from "react";
-import { Modal, View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/mapView/mapModal.styles";
-import mapStyleTabStyles, { getMapBoxStyle } from "../styles/layout/appCustomization/mapStyleTab.styles"
+import mapStyleTabStyles from "../styles/layout/appCustomization/mapStyleTab.styles"
 import colorPaletteTabStyles, { getColorCircleStyle } from "../styles/layout/appCustomization/colorPaletteTab.styles";
 import { useTheme } from "../contexts/ThemeContext";
 import { MapTypeModalProps } from "../interfaces/MapType";
@@ -18,8 +18,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
     "mapStyle"
   );
 
-  const palette = ["#14171b", "#050608", "#351017", "#14233a", "#0e3e30", "#21143d", "#3d1220", "#473516", "#294c14", "#473016"];
-
+  const palette = ["#121519","#040507","#320e15","#122035","#0d392b","#1f1238","#390f1d","#413013","#254610","#412b13"];
   const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
 
   return (
@@ -76,33 +75,50 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
             </TouchableOpacity>
           </View>
           {activeTab === "mapStyle" ? (
-            <View style={mapStyleTabStyles.container}>
-              {[{ type: "standard", label: "Claro", img: require("../../../../assets/appCustomization/mapsL.png"), color: "#e5e5e5" },
-                { type: "dark", label: "Escuro", img: require("../../../../assets/appCustomization/mapsD.png"), color: "#222222" },
-                { type: "satellite", label: "Satélite", img: require("../../../../assets/appCustomization/mapsS.png"), color: "#b0b0b0" }].map(opt => (
-                <TouchableOpacity
-                  key={opt.type}
-                  style={[
-                    mapStyleTabStyles.option,
-                    opt.type === "standard" ? mapStyleTabStyles.optionLeft : opt.type === "satellite" ? mapStyleTabStyles.optionRight : mapStyleTabStyles.optionCenter
-                  ]}
-                  onPress={() => {
-                    onSelect(opt.type as any);
-                    onClose();
-                  }}
-                >
-                  <View
-                    style={getMapBoxStyle(selectedType === opt.type, opt.color)}
-                  >
-                    <Image
-                      source={opt.img}
-                      style={{ width: 70, height: 70, borderRadius: 8 }}
-                      resizeMode="cover"
-                    />
-                  </View>
-                  <Text style={mapStyleTabStyles.label}>{opt.label}</Text>
-                </TouchableOpacity>
-              ))}
+            <View style={{ flex: 1 }}>
+              <ScrollView 
+                style={{ flex: 1 }} 
+                contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                  {[
+                    { type: "haunted", label: "Haunted", img: require("../../../../assets/appCustomization/maps2.png"), color: "#232326" },
+                    { type: "standard", label: "Claro", img: require("../../../../assets/appCustomization/maps3.png"), color: "#e5e5e5" },
+                    { type: "dark", label: "Escuro", img: require("../../../../assets/appCustomization/maps1.png"), color: "#222222" },
+                    { type: "satellite", label: "Satélite", img: require("../../../../assets/appCustomization/maps4.png"), color: "#b0b0b0" }
+                  ].map(opt => (
+                    <TouchableOpacity
+                      key={opt.type}
+                      style={{ width: '48%', marginBottom: 22, alignItems: 'center' }}
+                      onPress={() => {
+                        onSelect(opt.type as any);
+                        onClose();
+                      }}
+                      activeOpacity={0.85}
+                    >                 
+                    <View
+                        style={{
+                          width: '100%',
+                          aspectRatio: 1.3,
+                          borderRadius: 16,
+                          overflow: 'hidden',
+                          borderWidth: selectedType === opt.type ? 3 : 0,
+                          borderColor: selectedType === opt.type ? '#4fc3f7' : 'transparent',
+                          opacity: selectedType === opt.type ? 1 : 0.7,
+                        }}
+                      >
+                        <Image
+                          source={opt.img}
+                          style={{ width: '100%', height: '100%', borderRadius: 16 }}
+                          resizeMode="cover"
+                        />
+                      </View>
+                      <Text style={[mapStyleTabStyles.label, { marginTop: 8, fontSize: 16, textAlign: 'center' }]}>{opt.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
             </View>
           ) : (
             <View style={{ flex: 1 }}>

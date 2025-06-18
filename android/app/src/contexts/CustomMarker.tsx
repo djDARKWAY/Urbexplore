@@ -8,13 +8,13 @@ interface CustomMarkerProps {
   category: string;
 }
 
-const CustomMarker: React.FC<CustomMarkerProps> = ({ backgroundColor, category }) => {
+const CustomMarker: React.FC<CustomMarkerProps> = React.memo(({ backgroundColor, category }) => {
   const styles = markerStylesFn(backgroundColor);
   return (
     <View style={styles.container}>
       <MaterialCommunityIcons name={getMarkerIcon(category)} style={styles.icon} />
     </View>
   );
-};
+});
 
 export default CustomMarker;

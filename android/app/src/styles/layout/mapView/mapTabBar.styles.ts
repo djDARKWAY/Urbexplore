@@ -5,10 +5,10 @@ export const mapTabBarStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#151c21',
+    backgroundColor: '#23181b',
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: '#222',
+    borderTopColor: '#2d181a',
   },
   tab: {
     alignItems: 'center',
@@ -19,18 +19,18 @@ export const mapTabBarStyles = StyleSheet.create({
     padding: 8,
   },
   tabIcon: {
-    color: '#fff',
+    color: '#FFFFFF',
   },
   tabIconActive: {
-    backgroundColor: '#0d4d46',
-    color: '#fff',
+    backgroundColor: '#333',
+    color: '#FFFFFF',
   },
   tabIconInactive: {
     backgroundColor: 'transparent',
-    color: '#fff',
+    color: '#FFFFFF',
   },
   tabLabel: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 12,
   },
   tabLabelActive: {

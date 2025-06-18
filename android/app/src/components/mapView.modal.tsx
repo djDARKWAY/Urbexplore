@@ -7,7 +7,7 @@ import LocationDetailsModal from "./locationDetails.modal";
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { scaleBarStyles } from "../styles/layout/mapView/scaleBar.styles";
 import { getDynamicPalette } from "../utils/themeUtils";
-import { googleMapsCustom } from "../styles/layout/appCustomization/googleMapsCustom";
+import { googleMapsHaunted, googleMapsDark } from "../styles/layout/appCustomization/googleMapsCustom";
 import { useTheme } from "../contexts/ThemeContext";
 import CustomMarker from "../contexts/CustomMarker";
 import { Location as LocationType } from "../interfaces/Location";
@@ -28,7 +28,7 @@ const MapViewFullScreen = () => {
   const [selected, setSelected] = useState<LocationType | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
   const [, setError] = useState<string | null>(null)
-  const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite'>('standard')
+  const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite' | 'haunted'>('haunted')
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false)
   const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }
   const [currentRegion, setCurrentRegion] = useState<typeof initialRegion>(initialRegion)
@@ -96,7 +96,15 @@ const MapViewFullScreen = () => {
 
   // Load inicial da localização e locais
   useEffect(() => {
-    fetchData(currentRegion, true);
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('Permissão de localização negada');
+        return;
+      }
+      let loc = await Location.getCurrentPositionAsync({});
+      setLocation(loc.coords);
+    })();
   }, []);
 
   // Cleanup do timeout quando o componente for desmontado
@@ -148,6 +156,12 @@ const MapViewFullScreen = () => {
     debouncedFetchData(reg);
   }, [debouncedFetchData]);
 
+  // Função memoizada para abrir modal de detalhes
+  const handleMarkerPress = useCallback((place: LocationType) => {
+    setSelected(place);
+    setModalVisible(true);
+  }, []);
+
   // Calcula distância entre dois pontos
   const dist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371000;
@@ -191,7 +205,7 @@ const MapViewFullScreen = () => {
       { key: 'favorites', label: 'Favoritos', icon: 'star' as keyof typeof Ionicons.glyphMap },
     ];
     return (
-      <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 10 }]}> 
+      <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 10, backgroundColor: dynamicPalette.background }]}> 
         {tabs.map(tab => {
           const isActive = activeTab === tab.key;
           return (
@@ -203,11 +217,12 @@ const MapViewFullScreen = () => {
                 <Ionicons
                   name={tab.icon}
                   size={28}
-                  color={isActive ? mapTabBarStyles.tabIconActive.color : "#AAA"}
+                  color={isActive ? dynamicPalette.primary : dynamicPalette.textSecondary}
                 />
               </View>
               <Text style={[
                 mapTabBarStyles.tabLabel,
+                { color: isActive ? dynamicPalette.primary : dynamicPalette.textSecondary },
                 isActive && mapTabBarStyles.tabLabelActive
               ]}>{tab.label}</Text>
             </TouchableOpacity>
@@ -246,7 +261,11 @@ const MapViewFullScreen = () => {
         toolbarEnabled={false}
         rotateEnabled={true}
         mapType={mapType === 'satellite' ? 'satellite' : 'standard'}
-        customMapStyle={mapType === 'dark' ? googleMapsCustom : []}
+        customMapStyle={
+          mapType === 'dark' ? googleMapsDark :
+          mapType === 'haunted' ? googleMapsHaunted :
+          []
+        }
         zoomEnabled={true}
       >
         {/* Marcadores dos locais */}
@@ -254,7 +273,7 @@ const MapViewFullScreen = () => {
           <Marker
             key={place.id + backgroundColor}
             coordinate={{ latitude: place.lat, longitude: place.lon }}
-            onPress={() => { setSelected(place); setModalVisible(true); }}
+            onPress={() => handleMarkerPress(place)}
           >
             <CustomMarker backgroundColor={backgroundColor} category={place.category} />
           </Marker>
@@ -291,7 +310,7 @@ const MapViewFullScreen = () => {
           style={[mapStyles.compassButton]}
           onPress={goToNorth}
         >
-          <Entypo name="compass" size={26} color="#AAAAAA" style={{ transform: [{ rotate: `${-45 - heading}deg` }] }} />
+          <Entypo name="compass" size={26} color="#AAAAAA" style={{ transform: [{ rotate: `${135 - heading}deg` }] }} />
         </TouchableOpacity>
       )}
 
