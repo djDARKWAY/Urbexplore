@@ -4,8 +4,8 @@ import { palette } from "../../palette";
 export const scaleBarStyles = StyleSheet.create({
   container: {
     position: "absolute",
-    left: 10,
-    bottom: 65,
+    left: 15,
+    bottom: 60,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: `${palette.background}BB`,
@@ -13,12 +13,22 @@ export const scaleBarStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 2,
   },
-  bar: {
-    width: 72,
-    height: 5,
+  barContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    height: 9,
+    marginLeft: 6,
+  },
+  verticalTick: {
+    width: 2,
+    height: 6,
     backgroundColor: palette.text,
-    borderRadius: 1000,
-    marginRight: 8,
+    borderRadius: 1,
+  },
+  bar: {
+    height: 3,
+    backgroundColor: palette.text,
+    borderRadius: 1,
   },
   label: {
     color: palette.text,

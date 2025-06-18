@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder, Linking, Platform } from 'react-native';
+import React, { useRef, useEffect, useCallback } from "react";
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder, Linking, Platform, Share } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/locationDetails/detailsModal.styles";
 import { useTheme } from "../contexts/ThemeContext";
@@ -8,23 +8,19 @@ import { palette } from "../styles/palette";
 import { animateModalIn, animateModalOut, animateModalGestureOut, SCREEN_HEIGHT } from '../styles/animations/slideAnimation';
 import { LocationDetailsModalProps } from "../interfaces/DetailsProps";
 
-const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
-  visible,
-  onClose,
-  location,
-}) => {
+const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, onClose, location, }) => {
   const { backgroundColor } = useTheme();
   const dynamicPalette = getDynamicPalette(backgroundColor);
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const dragY = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
 
-  const closeWithAnimation = () => {
+  const closeWithAnimation = useCallback(() => {
     animateModalOut(slideAnim, dragY, () => {
       dragY.setValue(0);
       onClose();
     });
-  };
+  }, [slideAnim, dragY, onClose]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -66,16 +62,52 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
       slideAnim.setValue(SCREEN_HEIGHT);
       dragY.setValue(0);
     }
-  }, [visible]);
+  }, [visible, slideAnim, dragY]);
 
   const translateY = Animated.add(slideAnim, dragY);
 
-  const openMap = (lat?: number, lon?: number) => {
-    if (Platform.OS === 'android' && lat && lon) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-      Linking.openURL(url);
+  const openMap = useCallback((lat?: number, lon?: number) => {
+    if (lat && lon) {
+      const url = Platform.select({
+        ios: `http://maps.apple.com/?ll=${lat},${lon}`,
+        android: `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`
+      });
+      Linking.openURL(url!);
     }
-  };
+  }, []);
+
+  const shareLocation = useCallback(() => {
+    let message = `Embarca na aventura urbana e descobre *${location.title}* com o Urbexplore!`;
+    if (location.lat && location.lon) {
+      message += `\nhttps://www.google.com/maps/search/?api=1&query=${location.lat},${location.lon}`;
+    }
+    Share.share({ message });
+  }, [location]);
+
+  const renderStars = (rating: number | undefined | null, totalRate: number | undefined | null) => (
+    <View style={{ alignItems: 'center', marginBottom: 24 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+        {[1, 2, 3, 4, 5].map((i) => {
+          const isFull = i <= Math.floor(rating ?? 0);
+          const isHalf = !isFull && i - 1 < (rating ?? 0) && (rating ?? 0) % 1 >= 0.5;
+          return (
+            <Ionicons
+              key={i}
+              name={isFull ? 'star' : isHalf ? 'star-half' : 'star-outline'}
+              size={28}
+              color={palette.text}
+              style={{ marginHorizontal: 2 }}
+            />
+          );
+        })}
+        <Text style={{ color: palette.mutedText, fontSize: 16, marginLeft: 8 }}>
+          {rating !== undefined && rating !== null
+            ? `${rating.toFixed(1)}${totalRate !== undefined && totalRate !== null ? ` (${totalRate})` : ''}`
+            : ''}
+        </Text>
+      </View>
+    </View>
+  );
 
   return (
     <Modal
@@ -132,30 +164,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
               </View>
             )}
 
-            {location.rating !== undefined && location.rating !== null && (
-              <View style={{ alignItems: 'center', marginBottom: 24 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  {[1, 2, 3, 4, 5].map((i) => {
-                    const isFull = i <= Math.floor(location.rating ?? 0);
-                    const isHalf = !isFull && i - 1 < (location.rating ?? 0) && (location.rating ?? 0) % 1 >= 0.5;
-                    return (
-                      <Ionicons
-                        key={i}
-                        name={isFull ? 'star' : isHalf ? 'star-half' : 'star-outline'}
-                        size={28}
-                        color={palette.accent}
-                        style={{ marginHorizontal: 2 }}
-                      />
-                    );
-                  })}
-                  <Text style={{ color: palette.accent, fontSize: 16, marginLeft: 8 }}>
-                    {location.rating !== undefined && location.rating !== null
-                      ? `${location.rating.toFixed(1)}${location.totalRate !== undefined && location.totalRate !== null ? ` (${location.totalRate})` : ''}`
-                      : ''}
-                  </Text>
-                </View>
-              </View>
-            )}
+            {location.rating !== undefined && location.rating !== null && renderStars(location.rating, location.totalRate)}
 
             {location.warnings && location.warnings.length > 0 && (
               <View style={styles.warningsContainer}>
@@ -193,7 +202,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({
               <Text style={styles.actionText}>Navegar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={shareLocation}>
               <Ionicons name="share-social" size={24} color="#fff" />
               <Text style={styles.actionText}>Compartilhar</Text>
             </TouchableOpacity>

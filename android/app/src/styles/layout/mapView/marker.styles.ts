@@ -29,5 +29,9 @@ export const getMarkerIcon = (category: string) => {
       return "road-variant";
     case "Moradia":
       return "home";
+    case "Palácio":
+      return "castle";
+    case "Edifício":
+      return "office-building";
   }
 };

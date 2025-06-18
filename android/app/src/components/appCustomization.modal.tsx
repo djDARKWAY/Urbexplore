@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Modal, View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/mapView/mapModal.styles";
@@ -22,9 +22,6 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
 
   const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
 
-  const getModalBackground = () => {
-    return { backgroundColor };
-  };
   return (
     <Modal
       visible={visible}
@@ -33,7 +30,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContainer, getModalBackground()]}> 
+        <View style={[styles.modalContainer, { backgroundColor }]}> 
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onClose}
@@ -80,60 +77,32 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
           </View>
           {activeTab === "mapStyle" ? (
             <View style={mapStyleTabStyles.container}>
-              <TouchableOpacity
-                style={[mapStyleTabStyles.option, mapStyleTabStyles.optionLeft]}
-                onPress={() => {
-                  onSelect("standard");
-                  onClose();
-                }}
-              >
-                <View
-                  style={getMapBoxStyle(selectedType === "standard", "#e5e5e5")}
+              {[{ type: "standard", label: "Claro", img: require("../../../../assets/appCustomization/mapsL.png"), color: "#e5e5e5" },
+                { type: "dark", label: "Escuro", img: require("../../../../assets/appCustomization/mapsD.png"), color: "#222222" },
+                { type: "satellite", label: "Satélite", img: require("../../../../assets/appCustomization/mapsS.png"), color: "#b0b0b0" }].map(opt => (
+                <TouchableOpacity
+                  key={opt.type}
+                  style={[
+                    mapStyleTabStyles.option,
+                    opt.type === "standard" ? mapStyleTabStyles.optionLeft : opt.type === "satellite" ? mapStyleTabStyles.optionRight : mapStyleTabStyles.optionCenter
+                  ]}
+                  onPress={() => {
+                    onSelect(opt.type as any);
+                    onClose();
+                  }}
                 >
-                  <Image
-                    source={require("../../../../assets/appCustomization/mapsL.png")}
-                    style={{ width: 70, height: 70, borderRadius: 8 }}
-                    resizeMode="cover"
-                  />
-                </View>
-                <Text style={mapStyleTabStyles.label}>Claro</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[mapStyleTabStyles.option, mapStyleTabStyles.optionCenter]}
-                onPress={() => {
-                  onSelect("dark");
-                  onClose();
-                }}
-              >
-                <View
-                  style={getMapBoxStyle(selectedType === "dark", "#222")}
-                >
-                  <Image
-                    source={require("../../../../assets/appCustomization/mapsD.png")}
-                    style={{ width: 70, height: 70, borderRadius: 8 }}
-                    resizeMode="cover"
-                  />
-                </View>
-                <Text style={mapStyleTabStyles.label}>Escuro</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[mapStyleTabStyles.option, mapStyleTabStyles.optionRight]}
-                onPress={() => {
-                  onSelect("satellite");
-                  onClose();
-                }}
-              >
-                <View
-                  style={getMapBoxStyle(selectedType === "satellite", "#b0b0b0")}
-                >
-                  <Image
-                    source={require("../../../../assets/appCustomization/mapsS.png")}
-                    style={{ width: 70, height: 70, borderRadius: 8 }}
-                    resizeMode="cover"
-                  />
-                </View>
-                <Text style={mapStyleTabStyles.label}>Satélite</Text>
-              </TouchableOpacity>
+                  <View
+                    style={getMapBoxStyle(selectedType === opt.type, opt.color)}
+                  >
+                    <Image
+                      source={opt.img}
+                      style={{ width: 70, height: 70, borderRadius: 8 }}
+                      resizeMode="cover"
+                    />
+                  </View>
+                  <Text style={mapStyleTabStyles.label}>{opt.label}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
           ) : (
             <View style={{ flex: 1 }}>
