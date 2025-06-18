@@ -35,6 +35,7 @@ const MapViewFullScreen = () => {
   const [heading, setHeading] = useState(0)
   const mapRef = useRef<MapView>(null)
   const [initialLoading, setInitialLoading] = useState(true)
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Mapeia dados da API para o formato esperado
   const mapLocationData = (l: any): LocationType => ({
@@ -57,7 +58,7 @@ const MapViewFullScreen = () => {
     totalRate: l.totalRate ?? 0,
   });
 
-  // Atualiza fetchData para aceitar bounds
+  // Função para fazer fetch dos dados
   const fetchData = useCallback(async (region = currentRegion, isInitial = false) => {
     if (!region) return;
     if (isInitial) setInitialLoading(true);
@@ -69,6 +70,8 @@ const MapViewFullScreen = () => {
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
 
+      console.log('Fazendo request para região:', { minLat, maxLat, minLon, maxLon });
+
       const apiResponse = await fetch(
         `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`
       ).then(res => res.json());
@@ -79,11 +82,30 @@ const MapViewFullScreen = () => {
     } finally {
       if (isInitial) setInitialLoading(false);
     }
-  }, [currentRegion]);
+  }, []);
+
+  // Função com debounce para fazer fetch após parar o movimento
+  const debouncedFetchData = useCallback((region: typeof initialRegion) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    debounceTimeoutRef.current = setTimeout(() => {
+      fetchData(region);
+    }, 100);
+  }, [fetchData]);
 
   // Load inicial da localização e locais
   useEffect(() => {
     fetchData(currentRegion, true);
+  }, []);
+
+  // Cleanup do timeout quando o componente for desmontado
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Centra o mapa na localização do utilizador
@@ -105,7 +127,7 @@ const MapViewFullScreen = () => {
     }
   }, []);
 
-  // Atualiza região e pesquisa locais
+  // Atualiza região durante o movimento (sem fazer request)
   const handleRegionChange = useCallback((reg: typeof initialRegion) => {
     setCurrentRegion(reg);
     if (mapRef.current) {
@@ -113,8 +135,18 @@ const MapViewFullScreen = () => {
         setHeading(camera.heading || 0);
       });
     }
-    fetchData(reg);
-  }, [fetchData]);
+  }, []);
+
+  // Agenda pesquisa com debounce quando termina o movimento
+  const handleRegionChangeComplete = useCallback((reg: typeof initialRegion) => {
+    setCurrentRegion(reg);
+    if (mapRef.current) {
+      mapRef.current.getCamera().then((camera) => {
+        setHeading(camera.heading || 0);
+      });
+    }
+    debouncedFetchData(reg);
+  }, [debouncedFetchData]);
 
   // Calcula distância entre dois pontos
   const dist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -203,8 +235,9 @@ const MapViewFullScreen = () => {
       <MapView
         ref={mapRef}
         style={mapStyles.map}
-        region={currentRegion}
-        onRegionChangeComplete={handleRegionChange}
+        initialRegion={initialRegion}
+        onRegionChange={handleRegionChange}
+        onRegionChangeComplete={handleRegionChangeComplete}
         showsUserLocation={true}
         showsMyLocationButton={false}
         showsCompass={false}
@@ -214,6 +247,7 @@ const MapViewFullScreen = () => {
         rotateEnabled={true}
         mapType={mapType === 'satellite' ? 'satellite' : 'standard'}
         customMapStyle={mapType === 'dark' ? googleMapsCustom : []}
+        zoomEnabled={true}
       >
         {/* Marcadores dos locais */}
         {places.map(place => (
