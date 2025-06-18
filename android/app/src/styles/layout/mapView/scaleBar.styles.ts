@@ -5,7 +5,7 @@ export const scaleBarStyles = StyleSheet.create({
   container: {
     position: "absolute",
     left: 54,
-    bottom: 82,
+    bottom: 136,
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 999,

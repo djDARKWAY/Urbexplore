@@ -17,6 +17,7 @@
     "dotenv": "^16.5.0",
     "expo": "~53.0.11",
     "expo-location": "~18.1.5",
+    "expo-navigation-bar": "~4.2.5",
     "expo-status-bar": "~2.2.3",
     "express": "^5.1.0",
     "mongodb": "^6.17.0",

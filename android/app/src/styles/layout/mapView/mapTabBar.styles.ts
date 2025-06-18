@@ -6,7 +6,7 @@ export const mapTabBarStyles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#151c21',
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: '#222',
   },
@@ -16,21 +16,24 @@ export const mapTabBarStyles = StyleSheet.create({
   },
   tabIconWrapper: {
     borderRadius: 16,
-    padding: 6,
-    marginBottom: 2,
+    padding: 8,
   },
-  tabLabel: {
+  tabIcon: {
     color: '#fff',
-    fontSize: 13,
-    marginTop: 2,
-  },
-  tabLabelActive: {
-    fontWeight: 'bold',
   },
   tabIconActive: {
     backgroundColor: '#0d4d46',
+    color: '#fff',
   },
   tabIconInactive: {
     backgroundColor: 'transparent',
+    color: '#fff',
+  },
+  tabLabel: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  tabLabelActive: {
+    fontWeight: 'bold',
   },
 });

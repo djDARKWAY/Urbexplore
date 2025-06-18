@@ -28,7 +28,7 @@ const MapViewFullScreen = () => {
   const [places, setPlaces] = useState<LocationType[]>([]); // Locais da API
   const [selected, setSelected] = useState<LocationType | null>(null); // Local selecionado
   const [modalVisible, setModalVisible] = useState(false); // Modal de detalhes
-  const [error, setError] = useState<string | null>(null); // Erro
+  const [, setError] = useState<string | null>(null); // Erro
   const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite'>('standard'); // Tipo de mapa
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false); // Modal tipo de mapa
   const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }; // Região inicial
@@ -36,10 +36,9 @@ const MapViewFullScreen = () => {
   const [heading, setHeading] = useState(0); // Direção
   const mapRef = useRef<MapView>(null); // Referência do mapa
 
-  // Ao montar, define região inicial e carrega dados
+  // Ao montar, carrega dados iniciais
   useEffect(() => {
-    setCurrentRegion(initialRegion);
-    fetchData();
+    fetchData(currentRegion);
   }, []);
 
   // Mapeia dados da API para o formato esperado
@@ -63,25 +62,22 @@ const MapViewFullScreen = () => {
     totalRate: l.totalRate ?? 0,
   });
 
-  // Busca localização do utilizador e locais da API em paralelo
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  // Atualiza fetchData para aceitar bounds
+  const fetchData = useCallback(async (region = currentRegion) => {
+    if (!region) return;
+    // Só mostra loading no carregamento inicial
+    if (places.length === 0) setLoading(true);
     setError(null);
     try {
-      // Executa permissões e fetch em paralelo
-      const [locationResult, apiResponse] = await Promise.all([
-        (async () => {
-          let loc = null;
-          let { status } = await Location.requestForegroundPermissionsAsync();
-          if (status === "granted") {
-            let lastLoc = await Location.getLastKnownPositionAsync();
-            loc = lastLoc?.coords || (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords;
-          }
-          return loc;
-        })(),
-        fetch("http://192.168.1.79:3001/locations").then(res => res.json()),
-      ]);
-      if (locationResult) setLocation(locationResult);
+      // Calcula limites do mapa
+      const minLat = region.latitude - region.latitudeDelta / 2;
+      const maxLat = region.latitude + region.latitudeDelta / 2;
+      const minLon = region.longitude - region.longitudeDelta / 2;
+      const maxLon = region.longitude + region.longitudeDelta / 2;
+      // Busca locais apenas dentro dos limites
+      const apiResponse = await fetch(
+        `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`
+      ).then(res => res.json());
       setPlaces(apiResponse.locations.map(mapLocationData));
     } catch (e: any) {
       setError(e.message);
@@ -89,7 +85,7 @@ const MapViewFullScreen = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentRegion, places.length]);
 
   // Centra o mapa na localização do utilizador
   const goToUserLocation = useCallback(() => {
@@ -110,7 +106,7 @@ const MapViewFullScreen = () => {
     }
   }, []);
 
-  // Atualiza região e direção ao mover o mapa
+  // Atualiza região e busca locais ao mover/zoom
   const handleRegionChange = useCallback((reg: typeof initialRegion) => {
     setCurrentRegion(reg);
     if (mapRef.current) {
@@ -118,7 +114,8 @@ const MapViewFullScreen = () => {
         setHeading(camera.heading || 0);
       });
     }
-  }, []);
+    fetchData(reg);
+  }, [fetchData]);
 
   // Calcula distância entre dois pontos (metros)
   const dist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -155,27 +152,36 @@ const MapViewFullScreen = () => {
     return { label: `${val} ${unit}`, width };
   }, []);
 
-  // Barra de navegação inferior
-  const MapTabBar = ({ activeTab = 'MysteryMap', onTabPress }: { activeTab: string, onTabPress?: (tab: string) => void }) => {
+  // Barra de navegação inferior simples
+  const MapTabBar = ({ activeTab = 'map' }: { activeTab: string }) => {
     const insets = useSafeAreaInsets();
     const tabs = [
-      { key: 'MysteryMap', label: 'Mapa', icon: <Ionicons name="map" size={24} /> },
-      // ... outros tabs podem ser adicionados aqui
+      { key: 'map', label: 'Mapa', icon: 'map' as keyof typeof Ionicons.glyphMap },
+      { key: 'favorites', label: 'Favoritos', icon: 'star' as keyof typeof Ionicons.glyphMap },
     ];
     return (
-      <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 5 }]}>
-        {tabs.map(tab => (
-          <TouchableOpacity
-            key={tab.key}
-            style={mapTabBarStyles.tab}
-            onPress={() => onTabPress && onTabPress(tab.key)}
-          >
-            <View style={[mapTabBarStyles.tabIconWrapper, activeTab === tab.key ? mapTabBarStyles.tabIconActive : mapTabBarStyles.tabIconInactive]}>
-              {tab.icon}
-            </View>
-            <Text style={[mapTabBarStyles.tabLabel, activeTab === tab.key && mapTabBarStyles.tabLabelActive]}>{tab.label}</Text>
-          </TouchableOpacity>
-        ))}
+      <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 10 }]}> 
+        {tabs.map(tab => {
+          const isActive = activeTab === tab.key;
+          return (
+            <TouchableOpacity key={tab.key} style={mapTabBarStyles.tab}>
+              <View style={[
+                mapTabBarStyles.tabIconWrapper,
+                isActive ? mapTabBarStyles.tabIconActive : mapTabBarStyles.tabIconInactive
+              ]}>
+                <Ionicons
+                  name={tab.icon}
+                  size={28}
+                  color={isActive ? mapTabBarStyles.tabIconActive.color : "#AAA"}
+                />
+              </View>
+              <Text style={[
+                mapTabBarStyles.tabLabel,
+                isActive && mapTabBarStyles.tabLabelActive
+              ]}>{tab.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     );
   };
@@ -199,7 +205,7 @@ const MapViewFullScreen = () => {
         ref={mapRef}
         style={mapStyles.map}
         initialRegion={initialRegion}
-        onRegionChange={handleRegionChange}
+        onRegionChangeComplete={handleRegionChange} // Troca para evitar múltiplos loadings
         showsUserLocation={true}
         showsMyLocationButton={false}
         showsCompass={false}
@@ -291,7 +297,7 @@ const MapViewFullScreen = () => {
       )}
 
       {/* Barra de navegação */}
-      <MapTabBar activeTab="MysteryMap" />
+      <MapTabBar activeTab="map" />
     </View>
   );
 }

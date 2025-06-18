@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
+import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import MapViewFullScreen from './android/app/src/components/mapView.modal';
 import { ThemeProvider } from './android/app/src/contexts/ThemeContext';

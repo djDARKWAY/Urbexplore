@@ -4,10 +4,10 @@ import { getDynamicPalette } from "../../../utils/themeUtils";
 export const markerStylesFn = (backgroundColor: string) =>
   StyleSheet.create({
     container: {
-      width: 30,
-      height: 30,
+      width: 32,
+      height: 32,
       backgroundColor: getDynamicPalette(backgroundColor).background,
-      borderRadius: 15,
+      borderRadius: 16,
       borderWidth: 2,
       borderColor: "white",
       justifyContent: "center",
@@ -15,7 +15,7 @@ export const markerStylesFn = (backgroundColor: string) =>
     },
     icon: {
       color: "white",
-      fontSize: 20,
+      fontSize: 19,
     },
   });
 
