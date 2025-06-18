@@ -26,7 +26,7 @@ export const mapStyles = StyleSheet.create({
   button: buttonBase,
   currentLocationButton: {
     ...buttonBase,
-    bottom: 90,
+    bottom: 140,
     right: 15,
     width: 70,
     height: 70,
@@ -34,7 +34,7 @@ export const mapStyles = StyleSheet.create({
   },
   filterButton: {
     ...buttonBase,
-    bottom: 170,
+    bottom: 220,
     right: 22,
     width: 56,
     height: 56,
@@ -42,7 +42,7 @@ export const mapStyles = StyleSheet.create({
   },
   compassButton: {
     ...buttonBase,
-    bottom: 235,
+    bottom: 285,
     right: 31,
     width: 38,
     height: 38,

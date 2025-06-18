@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { View, ActivityIndicator, Alert, TouchableOpacity, Text } from "react-native";
+import { View, Alert, TouchableOpacity, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { mapStyles } from "../styles/layout/mapView/map.styles";
@@ -15,6 +15,7 @@ import { mapTabBarStyles } from "../styles/layout/mapView/mapTabBar.styles";
 import LoadingScreen from "../contexts/LoadingScreen";
 import { useFonts } from 'expo-font';
 import MapTypeModal from "./appCustomization.modal";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MapViewFullScreen = () => {
   // Cor de fundo do tema
@@ -156,12 +157,13 @@ const MapViewFullScreen = () => {
 
   // Barra de navegação inferior
   const MapTabBar = ({ activeTab = 'MysteryMap', onTabPress }: { activeTab: string, onTabPress?: (tab: string) => void }) => {
+    const insets = useSafeAreaInsets();
     const tabs = [
       { key: 'MysteryMap', label: 'Mapa', icon: <Ionicons name="map" size={24} /> },
       // ... outros tabs podem ser adicionados aqui
     ];
     return (
-      <View style={mapTabBarStyles.container}>
+      <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 5 }]}>
         {tabs.map(tab => (
           <TouchableOpacity
             key={tab.key}

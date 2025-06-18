@@ -3,7 +3,7 @@ import { View, Text, Animated, StyleSheet } from "react-native";
 import { loadingScreenStyles } from "../styles/layout/mapView/loadingScreen.style";
 import { palette } from "../styles/palette";
 import { useLoadingAnimations } from "../styles/animations/loadingAnimations";
-import { AnimatedBackground } from "../styles/animations/AnimatedBackground";
+import { AnimatedBackground } from "../styles/animations/animatedBackground";
 
 const loadingShorts = [
   "A carregar...",
