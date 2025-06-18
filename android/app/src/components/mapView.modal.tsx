@@ -104,6 +104,7 @@ const MapViewFullScreen = () => {
       }
       let loc = await Location.getCurrentPositionAsync({});
       setLocation(loc.coords);
+      fetchData(currentRegion, true);
     })();
   }, []);
 
@@ -202,7 +203,6 @@ const MapViewFullScreen = () => {
     const insets = useSafeAreaInsets();
     const tabs = [
       { key: 'map', label: 'Mapa', icon: 'map' as keyof typeof Ionicons.glyphMap },
-      { key: 'favorites', label: 'Favoritos', icon: 'star' as keyof typeof Ionicons.glyphMap },
     ];
     return (
       <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 10, backgroundColor: dynamicPalette.background }]}> 
