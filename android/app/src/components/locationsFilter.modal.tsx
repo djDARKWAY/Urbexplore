@@ -17,7 +17,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, on
     
     useEffect(() => {
         if (!visible) return;
-        fetch('http://192.168.1.74:3001/locations/categories')
+        fetch('http://192.168.1.85:3001/locations/categories')
             .then(res => res.json())
             .then(data => {
                 if (data.categories) {

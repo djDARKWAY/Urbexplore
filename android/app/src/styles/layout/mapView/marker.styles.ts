@@ -33,5 +33,11 @@ export const getMarkerIcon = (category: string) => {
       return "castle";
     case "Edifício":
       return "office-building";
+    case "Industrial":
+      return "factory";
+    case "Religião":
+      return "church";
+    case "Hotel":
+      return "bed";
   }
 };

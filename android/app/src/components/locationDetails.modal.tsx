@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useCallback } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder, Linking, Platform, Share } from 'react-native';
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder, Linking, Platform, Share, Dimensions } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/locationDetails/detailsModal.styles";
 import { useTheme } from "../contexts/ThemeContext";
@@ -14,6 +14,13 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const dragY = useRef(new Animated.Value(0)).current;
   const lastOffset = useRef(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [displayedImageIndex, setDisplayedImageIndex] = useState(0); // Novo estado para controlar a imagem exibida
+  const [nextImageIndex, setNextImageIndex] = useState<number | null>(null); // Novo estado para o índice da próxima imagem
+  const windowWidth = Dimensions.get('window').width;
+  const imageHeight = Math.round(windowWidth * 9 / 16); // 16:9 ratio
+  const [imageSlideAnim] = useState(new Animated.Value(0));
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
   const closeWithAnimation = useCallback(() => {
     animateModalOut(slideAnim, dragY, () => {
@@ -58,10 +65,12 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
   useEffect(() => {
     if (visible) {
       animateModalIn(slideAnim, dragY).start();
+      setDisplayedImageIndex(0); // Resetar imagem exibida ao abrir
     } else {
       slideAnim.setValue(SCREEN_HEIGHT);
       dragY.setValue(0);
     }
+    setCurrentImageIndex(0); // reset ao abrir
   }, [visible, slideAnim, dragY]);
 
   const translateY = Animated.add(slideAnim, dragY);
@@ -109,6 +118,18 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
     </View>
   );
 
+  // Funções de navegação agora apenas trocam o índice
+  const goToPrevImage = () => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1);
+    }
+  };
+  const goToNextImage = () => {
+    if (location.images && currentImageIndex < location.images.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -116,22 +137,38 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={[styles.modalContainer, { backgroundColor: palette.transparentBackground }]}>
+      <View style={[styles.modalContainer, { backgroundColor: palette.transparentBackground }]}> 
         <Animated.View
           style={[styles.modalContent, { backgroundColor: dynamicPalette.background, transform: [{ translateY }] }]}
         >
-          <Animated.View style={styles.imageContainer} {...panResponder.panHandlers}>
-            {location.images && location.images.length > 0 && location.images[0] ? (
-              <Image
-                source={{ uri: location.images[0] }}
-                style={styles.image}
-                resizeMode="cover"
-              />
+            {/* Imagem com setas */}
+            <Animated.View style={styles.imageContainer} {...panResponder.panHandlers}>
+            {location.images?.length ? (
+              <View style={{ width: windowWidth, height: imageHeight, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', overflow: 'hidden' }}>
+                {location.images.length > 1 && (
+                  <>
+                    {currentImageIndex > 0 && (
+                      <TouchableOpacity onPress={goToPrevImage} style={{ position: 'absolute', left: 10, top: '50%', zIndex: 2, transform: [{ translateY: -22 }] }}>
+                        <Ionicons name="chevron-back" size={28} color="#fff" style={{ backgroundColor: 'rgba(0,0,0,0.45)', borderRadius: 22, padding: 8 }} />
+                      </TouchableOpacity>
+                    )}
+                    {currentImageIndex < location.images.length - 1 && (
+                      <TouchableOpacity onPress={goToNextImage} style={{ position: 'absolute', right: 10, top: '50%', zIndex: 2, transform: [{ translateY: -22 }] }}>
+                        <Ionicons name="chevron-forward" size={28} color="#fff" style={{ backgroundColor: 'rgba(0,0,0,0.45)', borderRadius: 22, padding: 8 }} />
+                      </TouchableOpacity>
+                    )}
+                  </>
+                )}
+                <Image
+                  source={{ uri: location.images[currentImageIndex] }}
+                  style={{ width: windowWidth, height: imageHeight, resizeMode: 'cover' }}
+                />
+              </View>
             ) : null}
             <TouchableOpacity style={styles.closeButton} onPress={closeWithAnimation}>
               <Ionicons name="close" size={20} color="#fff" />
             </TouchableOpacity>
-          </Animated.View>
+            </Animated.View>
 
           <ScrollView style={styles.infoContainer} contentContainerStyle={{ paddingBottom: 90 }}>
             <View style={styles.headerContainer}>

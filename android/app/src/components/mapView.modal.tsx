@@ -61,6 +61,7 @@ const MapViewFullScreen = () => {
     lon: l.lon ?? 0,
     totalRate: l.totalRate ?? 0,
   });
+  
   // Função para fazer fetch dos dados
   const fetchData = useCallback(async (region = currentRegion, isInitial = false, categories = selectedCategories) => {
     if (!region) return;
@@ -72,7 +73,7 @@ const MapViewFullScreen = () => {
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
 
-      let url = `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
+      let url = `http://192.168.1.85:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
       
       // Adiciona filtros de categoria se existirem e não sejam apenas strings vazias
       if (categories && categories.filter(c => c && c.trim() !== '').length > 0) {
@@ -89,6 +90,7 @@ const MapViewFullScreen = () => {
       if (isInitial) setInitialLoading(false);
     }
   }, [selectedCategories]);
+
   // Função com debounce para fazer fetch após parar o movimento
   const debouncedFetchData = useCallback((region: typeof initialRegion, categories = selectedCategories) => {
     if (debounceTimeoutRef.current) {
@@ -97,7 +99,7 @@ const MapViewFullScreen = () => {
     debounceTimeoutRef.current = setTimeout(() => {
       fetchData(region, false, categories);
     }, 100);
-  }, [fetchData, selectedCategories]);  // Load inicial da localização e locais
+  }, [fetchData, selectedCategories]);
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -148,6 +150,7 @@ const MapViewFullScreen = () => {
       });
     }
   }, []);
+  
   // Agenda pesquisa com debounce quando termina o movimento
   const handleRegionChangeComplete = useCallback((reg: typeof initialRegion) => {
     setCurrentRegion(reg);
@@ -158,6 +161,7 @@ const MapViewFullScreen = () => {
     }
     debouncedFetchData(reg, selectedCategories);
   }, [debouncedFetchData, selectedCategories]);
+
   // Função memoizada para abrir modal de detalhes
   const handleMarkerPress = useCallback((place: LocationType) => {
     setSelected(place);
@@ -293,7 +297,7 @@ const MapViewFullScreen = () => {
         ))}
       </MapView>
       
-      {/* Botão filtro */}
+      {/* Botão filtro de localizações*/}
       <TouchableOpacity
         style={mapStyles.filterTopButton}
         onPress={() => setFilterModalVisible(true)}
@@ -301,7 +305,7 @@ const MapViewFullScreen = () => {
         <Ionicons name="filter" size={24} color="#AAAAAA" />
       </TouchableOpacity>
       
-      {/* Modal de Filtros */}
+      {/* Modal de filtro de localizações*/}
       <FilterModal
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
@@ -311,7 +315,7 @@ const MapViewFullScreen = () => {
         onSelectCategory={(cat) => setSelectedCategories((prev) => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
       />
 
-      {/* Botão tipo de mapa */}
+      {/* Botão de personalização do mapa */}
       <TouchableOpacity
         style={[mapStyles.button, mapStyles.filterButton]}
         onPress={() => setMapTypeModalVisible(true)}
