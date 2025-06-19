@@ -50,7 +50,7 @@ export const mapStyles = StyleSheet.create({
   },
   filterTopButton: {
     ...buttonBase,
-    top: 30,
+    top: 40,
     right: 22,
     width: 56,
     height: 56,

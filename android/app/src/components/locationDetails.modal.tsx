@@ -7,6 +7,7 @@ import { getDynamicPalette } from "../utils/themeUtils";
 import { palette } from "../styles/palette";
 import { animateModalIn, animateModalOut, animateModalGestureOut, SCREEN_HEIGHT } from '../styles/animations/slideAnimation';
 import { LocationDetailsModalProps } from "../interfaces/DetailsProps";
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, onClose, location, }) => {
   const { backgroundColor } = useTheme();
@@ -17,6 +18,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [displayedImageIndex, setDisplayedImageIndex] = useState(0); // Novo estado para controlar a imagem exibida
   const [nextImageIndex, setNextImageIndex] = useState<number | null>(null); // Novo estado para o índice da próxima imagem
+  const [fullscreen, setFullscreen] = useState(false);
   const windowWidth = Dimensions.get('window').width;
   const imageHeight = Math.round(windowWidth * 9 / 16); // 16:9 ratio
   const [imageSlideAnim] = useState(new Animated.Value(0));
@@ -65,13 +67,23 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
   useEffect(() => {
     if (visible) {
       animateModalIn(slideAnim, dragY).start();
-      setDisplayedImageIndex(0); // Resetar imagem exibida ao abrir
+      setDisplayedImageIndex(0);
     } else {
       slideAnim.setValue(SCREEN_HEIGHT);
       dragY.setValue(0);
     }
-    setCurrentImageIndex(0); // reset ao abrir
+    setCurrentImageIndex(0);
   }, [visible, slideAnim, dragY]);
+
+  useEffect(() => {
+    if (visible && location.images && location.images.length > 0) {
+      location.images.forEach((img) => {
+        if (img) {
+          Image.prefetch(img);
+        }
+      });
+    }
+  }, [visible, location.images]);
 
   const translateY = Animated.add(slideAnim, dragY);
 
@@ -159,10 +171,12 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
                     )}
                   </>
                 )}
-                <Image
-                  source={{ uri: location.images[currentImageIndex] }}
-                  style={{ width: windowWidth, height: imageHeight, resizeMode: 'cover' }}
-                />
+                <TouchableOpacity activeOpacity={0.9} onPress={() => setFullscreen(true)}>
+                  <Image
+                    source={{ uri: location.images[currentImageIndex] }}
+                    style={{ width: windowWidth, height: imageHeight, resizeMode: 'cover' }}
+                  />
+                </TouchableOpacity>
               </View>
             ) : null}
             <TouchableOpacity style={styles.closeButton} onPress={closeWithAnimation}>
@@ -246,6 +260,35 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
           </View>
         </Animated.View>
       </View>
+
+      {/* Fullscreen Modal */}
+      <Modal
+        visible={fullscreen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setFullscreen(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.97)' }}>
+          <ImageViewer
+            imageUrls={(location.images || []).map((img) => ({ url: img }))}
+            index={currentImageIndex}
+            onSwipeDown={() => setFullscreen(false)}
+            enableSwipeDown={true}
+            onCancel={() => setFullscreen(false)}
+            saveToLocalByLongPress={false}
+            renderIndicator={(currentIndex, allSize) => (
+              <View style={{ position: 'absolute', top: 40, alignSelf: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 16 }}>{currentIndex} / {allSize}</Text>
+              </View>
+            )}
+            renderHeader={() => (
+              <TouchableOpacity style={[styles.closeButton, { top: 40, right: 20, zIndex: 10 }]} onPress={() => setFullscreen(false)}>
+                <Ionicons name="close" size={28} color="#fff" />
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </Modal>
     </Modal>
   );
 };

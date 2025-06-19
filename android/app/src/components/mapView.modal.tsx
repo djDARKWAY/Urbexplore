@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { View, Alert, TouchableOpacity, Text } from "react-native";
+import { View, Alert, TouchableOpacity, Text, Modal } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { mapStyles } from "../styles/layout/mapView/map.styles";
@@ -17,6 +17,7 @@ import { useFonts } from 'expo-font';
 import MapTypeModal from "./appCustomization.modal";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FilterModal from './locationsFilter.modal';
+import UserProfile from './userProfile.modal';
 
 const MapViewFullScreen = () => {
   const { backgroundColor } = useTheme();
@@ -33,6 +34,7 @@ const MapViewFullScreen = () => {
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false)
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
   const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }
   const [currentRegion, setCurrentRegion] = useState<typeof initialRegion>(initialRegion)
   const [heading, setHeading] = useState(0)
@@ -73,7 +75,7 @@ const MapViewFullScreen = () => {
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
 
-      let url = `http://192.168.1.85:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
+      let url = `http://192.168.1.92:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
       
       // Adiciona filtros de categoria se existirem e não sejam apenas strings vazias
       if (categories && categories.filter(c => c && c.trim() !== '').length > 0) {
@@ -215,17 +217,27 @@ const MapViewFullScreen = () => {
     return { label: `${val} ${unit}`, width };
   }, []);
 
-  // Barra de navegação inferior
-  const MapTabBar = ({ activeTab = 'map' }: { activeTab: string }) => {
+  // Barra de navegação
+  const MapTabBar = ({ activeTab = 'map', onProfilePress }: { activeTab: string, onProfilePress: () => void }) => {
     const tabs = [
       { key: 'map', label: 'Mapa', icon: 'map' as keyof typeof Ionicons.glyphMap },
+      { key: 'profile', label: 'Perfil', icon: 'person' as keyof typeof Ionicons.glyphMap },
     ];
+
     return (
       <View style={[mapTabBarStyles.container, { paddingBottom: insets.bottom + 10, backgroundColor: dynamicPalette.background }]}> 
         {tabs.map(tab => {
           const isActive = activeTab === tab.key;
           return (
-            <TouchableOpacity key={tab.key} style={mapTabBarStyles.tab}>
+            <TouchableOpacity 
+              key={tab.key} 
+              style={mapTabBarStyles.tab} 
+              onPress={() => {
+                if (tab.key === 'profile') {
+                  onProfilePress();
+                }
+              }}
+            >
               <View style={[
                 mapTabBarStyles.tabIconWrapper,
                 isActive ? mapTabBarStyles.tabIconActive : mapTabBarStyles.tabIconInactive
@@ -384,7 +396,19 @@ const MapViewFullScreen = () => {
       )}
 
       {/* Barra de navegação */}
-      <MapTabBar activeTab="map" />
+      <MapTabBar activeTab="map" onProfilePress={() => setProfileModalVisible(true)} />
+
+      {/* UserProfile Modal */}
+      <Modal
+        visible={profileModalVisible}
+        animationType="slide"
+        onRequestClose={() => setProfileModalVisible(false)}
+      >
+        <UserProfile />
+        <TouchableOpacity onPress={() => setProfileModalVisible(false)}>
+          <Text style={{ textAlign: 'center', margin: 10, color: 'blue' }}>Fechar</Text>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }

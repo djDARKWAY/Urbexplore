@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     top: 12,
     right: 12,
     backgroundColor: palette.closeButton,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 4,
   },
   infoContainer: {

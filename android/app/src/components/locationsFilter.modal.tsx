@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../contexts/ThemeContext';
 import styles from '../styles/layout/locationsFilter/locationsFilter.styles';
 
 type FilterModalProps = {
@@ -14,10 +15,11 @@ type FilterModalProps = {
 
 const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, onReset, selectedCategories, onSelectCategory }) => {
     const [categories, setCategories] = useState<string[]>([]);
-    
+    const { backgroundColor } = useTheme();
+
     useEffect(() => {
         if (!visible) return;
-        fetch('http://192.168.1.85:3001/locations/categories')
+        fetch('http://192.168.1.92:3001/locations/categories')
             .then(res => res.json())
             .then(data => {
                 if (data.categories) {
@@ -43,29 +45,53 @@ const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, on
             visible={visible}
             onRequestClose={onClose}
         >
-            <View style={styles.modalContainer}>
+            <View style={[styles.modalContainer, { backgroundColor: "rgba(0,0,0,0.69)" }]}>
+                {/* Background dinâmico */}
                 <View style={styles.modalContent}>
                     <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                        <Ionicons name="close" size={24} color="#222" />
+                        <Ionicons name="close" size={24} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.title}>Filtros</Text>
-                    <Text style={styles.subtitle}>Categoria</Text>
-                    <View style={styles.categoriesContainer}>
-                        {categories.map((category, idx) => (
-                            <TouchableOpacity
-                                key={category}
-                                style={[
-                                    styles.categoryButton,
-                                    selectedCategories.includes(category) && styles.categoryButtonSelected,
-                                ]}
-                                onPress={() => onSelectCategory(category)}
-                            >
-                                <Text style={[
-                                    styles.categoryButtonText,
-                                    selectedCategories.includes(category) && styles.categoryButtonTextSelected,
-                                ]}>{category}</Text>
-                            </TouchableOpacity>
-                        ))}
+                    <View style={styles.categoryContainer}>
+                        <Text style={styles.subtitle}>Categoria</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <View>
+                                <View style={{ flexDirection: 'row', marginBottom: 8 }}>
+                                    {categories.slice(0, Math.ceil(categories.length / 2)).map((category, idx) => (
+                                        <TouchableOpacity
+                                            key={category}
+                                            style={[
+                                                styles.categoryButton,
+                                                selectedCategories.includes(category) && styles.categoryButtonSelected,
+                                            ]}
+                                            onPress={() => onSelectCategory(category)}
+                                        >
+                                            <Text style={[
+                                                styles.categoryButtonText,
+                                                selectedCategories.includes(category) && styles.categoryButtonTextSelected,
+                                            ]}>{category}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    {categories.slice(Math.ceil(categories.length / 2)).map((category, idx) => (
+                                        <TouchableOpacity
+                                            key={category}
+                                            style={[
+                                                styles.categoryButton,
+                                                selectedCategories.includes(category) && styles.categoryButtonSelected,
+                                            ]}
+                                            onPress={() => onSelectCategory(category)}
+                                        >
+                                            <Text style={[
+                                                styles.categoryButtonText,
+                                                selectedCategories.includes(category) && styles.categoryButtonTextSelected,
+                                            ]}>{category}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+                        </ScrollView>
                     </View>
                     <View style={styles.actionButtonsRow}>
                         <TouchableOpacity
@@ -75,7 +101,7 @@ const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, on
                             <Text style={styles.clearButtonText}>Limpar</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={styles.applyButton}
+                            style={[styles.applyButton, { backgroundColor }]}
                             onPress={handleApply}
                         >
                             <Text style={styles.applyButtonText}>Aplicar</Text>

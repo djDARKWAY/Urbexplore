@@ -1,46 +1,41 @@
 import { StyleSheet } from "react-native";
+import { palette } from "../../palette";
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(0,0,0,0.69)",
   },
   modalContent: {
-    height: "75%",
-    backgroundColor: "#fff",
+    backgroundColor: "#090909",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 24,
-    paddingTop: 10,
+    padding: 16,
+    paddingTop: 0,
     paddingBottom: 80,
   },
   closeButton: {
     position: "absolute",
-    top: 16,
-    right: 16,
-    zIndex: 10,
-    backgroundColor: "#eee",
-    borderRadius: 16,
+    top: 12,
+    right: 12,
+    backgroundColor: palette.closeButton,
+    borderRadius: 24,
     padding: 4,
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    marginVertical: 8,
+    marginVertical: 16,
     alignSelf: "flex-start",
+    color: "#fff",
   },
   subtitle: {
     fontSize: 15,
     fontWeight: "500",
-    color: "#444",
-    marginBottom: 8,
-    alignSelf: "flex-start",
-  },
-  categoriesContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    color: "#898989",
     marginBottom: 16,
+    alignSelf: "flex-start",
   },
   categoryButton: {
     height: 36,
@@ -57,7 +52,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#222",
   },
   categoryButtonText: {
-    color: "#222",
+    color: "#000",
     fontWeight: "500",
     fontSize: 13,
   },
@@ -72,7 +67,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#090909",
   },
   clearButton: {
     backgroundColor: "#eee",
@@ -83,7 +78,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   clearButtonText: {
-    color: "#222",
+    color: "#000",
     fontWeight: "bold",
     fontSize: 18,
   },
@@ -99,6 +94,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
     fontSize: 18,
+  },
+  categoryContainer: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
   },
 });
 

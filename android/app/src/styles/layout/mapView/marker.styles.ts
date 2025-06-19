@@ -25,7 +25,7 @@ export const getMarkerIcon = (category: string) => {
       return "hospital";
     case "Mina":
       return "hard-hat";
-    case "Estrada":
+    case "Portagem":
       return "road-variant";
     case "Moradia":
       return "home";
@@ -39,5 +39,7 @@ export const getMarkerIcon = (category: string) => {
       return "church";
     case "Hotel":
       return "bed";
+    case "Quinta":
+      return "barn";
   }
 };
