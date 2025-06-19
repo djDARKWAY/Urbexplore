@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { View, Alert, TouchableOpacity, Text } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import * as Location from "expo-location";
 import { mapStyles } from "../styles/layout/mapView/map.styles";
 import LocationDetailsModal from "./locationDetails.modal";
@@ -16,6 +16,7 @@ import LoadingScreen from "../contexts/LoadingScreen";
 import { useFonts } from 'expo-font';
 import MapTypeModal from "./appCustomization.modal";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FilterModal from './locationsFilter.modal';
 
 const MapViewFullScreen = () => {
   const { backgroundColor } = useTheme();
@@ -30,12 +31,15 @@ const MapViewFullScreen = () => {
   const [, setError] = useState<string | null>(null)
   const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite' | 'haunted'>('haunted')
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false)
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }
   const [currentRegion, setCurrentRegion] = useState<typeof initialRegion>(initialRegion)
   const [heading, setHeading] = useState(0)
   const mapRef = useRef<MapView>(null)
   const [initialLoading, setInitialLoading] = useState(true)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const insets = useSafeAreaInsets();
 
   // Mapeia dados da API para o formato esperado
   const mapLocationData = (l: any): LocationType => ({
@@ -64,7 +68,6 @@ const MapViewFullScreen = () => {
     if (isInitial) setInitialLoading(true);
     setError(null);
     try {
-      // Obtém locais filtrando por coordenadas (cantos do ecrã)
       const minLat = region.latitude - region.latitudeDelta / 2;
       const maxLat = region.latitude + region.latitudeDelta / 2;
       const minLon = region.longitude - region.longitudeDelta / 2;
@@ -198,7 +201,6 @@ const MapViewFullScreen = () => {
 
   // Barra de navegação inferior
   const MapTabBar = ({ activeTab = 'map' }: { activeTab: string }) => {
-    const insets = useSafeAreaInsets();
     const tabs = [
       { key: 'map', label: 'Mapa', icon: 'map' as keyof typeof Ionicons.glyphMap },
     ];
@@ -246,13 +248,14 @@ const MapViewFullScreen = () => {
   return (
     <View style={[mapStyles.container, { backgroundColor: dynamicPalette.background }]}> 
       <MapView
+        provider={PROVIDER_GOOGLE}
         ref={mapRef}
         style={mapStyles.map}
         initialRegion={initialRegion}
         onRegionChange={handleRegionChange}
         onRegionChangeComplete={handleRegionChangeComplete}
-        showsUserLocation={true}
         showsMyLocationButton={false}
+        showsUserLocation={false}
         showsCompass={false}
         minZoomLevel={7}
         maxZoomLevel={21}
@@ -278,6 +281,35 @@ const MapViewFullScreen = () => {
         ))}
       </MapView>
       
+      {/* Botão filtro no canto superior direito, respeitando safe-area */}
+      <TouchableOpacity
+        style={[
+          mapStyles.button,
+          {
+            top: insets.top + 16,
+            right: 16,
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            position: 'absolute',
+            zIndex: 10,
+          },
+        ]}
+        onPress={() => setFilterModalVisible(true)}
+      >
+        <Ionicons name="filter" size={24} color="#AAAAAA" />
+      </TouchableOpacity>
+
+      {/* Modal de Filtros */}
+      <FilterModal
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        onApply={() => setFilterModalVisible(false)}
+        onReset={() => setSelectedCategories([])}
+        selectedCategories={selectedCategories}
+        onSelectCategory={(cat) => setSelectedCategories((prev) => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
+      />
+
       {/* Botão tipo de mapa */}
       <TouchableOpacity
         style={[mapStyles.button, mapStyles.filterButton]}

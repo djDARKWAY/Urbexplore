@@ -7,7 +7,7 @@ import colorPaletteTabStyles, { getColorCircleStyle } from "../styles/layout/app
 import { useTheme } from "../contexts/ThemeContext";
 import { MapTypeModalProps } from "../interfaces/MapType";
 
-const palette = ["#121519","#040507","#320e15","#122035","#0d392b","#1f1238","#390f1d","#413013","#254610","#412b13"];
+const palette = ["#121519","#040507","#2a0c12","#0e1a2a","#0a2e22","#180d2b","#2e0c17","#33270f","#1d370c","#33210f"];
 const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
 const defaultColor = palette[2];
 
@@ -36,7 +36,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.modalOverlay}>
-        <View style={[styles.modalContainer, { backgroundColor }]}> 
+        <View style={[styles.modalContainer, { backgroundColor: backgroundColor }]}> 
           <TouchableOpacity
             style={styles.closeButton}
             onPress={onClose}
@@ -81,8 +81,9 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               </Text>
             </TouchableOpacity>
           </View>
-          {activeTab === "mapStyle" ? (
-            <View style={{ flex: 1 }}>
+          {/* Container do conteúdo com fundo cinza escuro */}
+          <View style={{ flex: 1, backgroundColor: '#090909', paddingTop: 8 }}>
+            {activeTab === "mapStyle" ? (
               <ScrollView 
                 style={{ flex: 1 }} 
                 contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
@@ -97,7 +98,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                   ].map(opt => (
                     <TouchableOpacity
                       key={opt.type}
-                      style={{ width: '48%', marginBottom: 22, alignItems: 'center' }}
+                      style={{ width: '48%', marginBottom: 10, alignItems: 'center' }}
                       onPress={() => {
                         onSelect(opt.type as any);
                         onClose();
@@ -111,7 +112,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                           borderRadius: 16,
                           overflow: 'hidden',
                           borderWidth: selectedType === opt.type ? 3 : 0,
-                          borderColor: selectedType === opt.type ? '#4fc3f7' : 'transparent',
+                          borderColor: selectedType === opt.type ? backgroundColor : 'transparent',
                           opacity: selectedType === opt.type ? 1 : 0.7,
                         }}
                       >
@@ -126,31 +127,31 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                   ))}
                 </View>
               </ScrollView>
-            </View>
-          ) : (
-            <View style={{ flex: 1 }}>
-              {paletteRows.map((row, rowIndex) => (
-                <View key={rowIndex} style={colorPaletteTabStyles.row}>
-                  {row.map((color) => (
-                    <TouchableOpacity
-                      key={color}
-                      style={getColorCircleStyle(backgroundColor === color, color)}
-                      onPress={() => {
-                        setBackgroundColor(color);
-                      }}
-                    >
-                      {backgroundColor === color && (
-                        <Ionicons name="checkmark" size={24} color="#fff" />
-                      )}
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              ))}
-              <Text style={colorPaletteTabStyles.infoText}>
-                Seleciona uma cor para personalizar a interface
-              </Text>
-            </View>
-          )}
+            ) : (
+              <View style={{ flex: 1 }}>
+                {paletteRows.map((row, rowIndex) => (
+                  <View key={rowIndex} style={colorPaletteTabStyles.row}>
+                    {row.map((color) => (
+                      <TouchableOpacity
+                        key={color}
+                        style={getColorCircleStyle(backgroundColor === color, color)}
+                        onPress={() => {
+                          setBackgroundColor(color);
+                        }}
+                      >
+                        {backgroundColor === color && (
+                          <Ionicons name="checkmark" size={24} color="#fff" />
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                ))}
+                <Text style={colorPaletteTabStyles.infoText}>
+                  Seleciona uma cor para personalizar a interface
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
       </View>
     </Modal>

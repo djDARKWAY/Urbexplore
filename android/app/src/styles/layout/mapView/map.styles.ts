@@ -48,4 +48,14 @@ export const mapStyles = StyleSheet.create({
     height: 38,
     borderRadius: 19,
   },
+  filterTopButton: {
+    ...buttonBase,
+    top: 0,
+    right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    position: "absolute",
+    zIndex: 10,
+  },
 });

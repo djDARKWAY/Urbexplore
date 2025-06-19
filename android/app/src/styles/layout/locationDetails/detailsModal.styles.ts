@@ -59,15 +59,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginBottom: 5,
   },
-  easyBadge: {
-    backgroundColor: palette.badgeEasy,
-  },
-  mediumBadge: {
-    backgroundColor: palette.badgeMedium,
-  },
-  hardBadge: {
-    backgroundColor: palette.badgeHard,
-  },
   visitedBadge: {
     backgroundColor: palette.accent,
     paddingVertical: 4,

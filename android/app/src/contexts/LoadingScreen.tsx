@@ -4,32 +4,8 @@ import { loadingScreenStyles } from "../styles/layout/mapView/loadingScreen.styl
 import { palette } from "../styles/palette";
 import { useLoadingAnimations } from "../styles/animations/loadingAnimations";
 import { AnimatedBackground } from "../styles/animations/animatedBackground";
-
-const loadingShorts = [
-  "A carregar...",
-  "A preparar...",
-  "A explorar...",
-  "A descobrir...",
-  "A desenhar...",
-  "A verificar...",
-  "A aquecer...",
-  "A procurar...",
-  "A abrir portões...",
-];
-
-const loadingJokes = [
-  "Prometemos que não é por causa do Wi-Fi do vizinho!",
-  "E a fazer figas!",
-  "Até o elevador ficou sem paciência!",
-  "O programador foi buscar um pastel de nata",
-  "A ligar os satélites... quase lá!",
-  "A convencer os servidores a colaborarem.",
-  "A procurar o botão secreto de velocidade.",
-  "A pedir ajuda ao Google Maps.",
-  "A desenhar mapas com lápis e papel...",
-  "A perguntar ao GPS: “Já chegámos?”",
-  "A desenhar rotas com uma caneta bic!",
-];
+import { loadingJokes } from "./texts/loadingJokes";
+import { loadingShorts } from "./texts/loadingShorts";
 
 const LoadingScreen = () => {
   const { scaleAnim, opacityAnim, rotate, orbit } = useLoadingAnimations();
@@ -38,7 +14,13 @@ const LoadingScreen = () => {
 
   React.useEffect(() => {
     const jokeInterval = setInterval(() => {
-      setJokeIndex((prev) => (prev + 1) % loadingJokes.length);
+      setJokeIndex((prev) => {
+        let next;
+        do {
+          next = Math.floor(Math.random() * loadingJokes.length);
+        } while (next === prev && loadingJokes.length > 1);
+        return next;
+      });
     }, 2500);
     return () => clearInterval(jokeInterval);
   }, []);

@@ -1,19 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Dimensions } from "react-native";
-import { palette } from "../palette";
 
 const { width, height } = Dimensions.get("window");
 const CIRCLE_COUNT = 8;
-const COLORS = [
-  palette.loadingCircle,
-  palette.loadingDot,
-  palette.accent,
-  palette.badgeEasy,
-  palette.badgeMedium,
-  palette.badgeHard,
-  palette.loadingText,
-  palette.loadingSecondaryText,
-];
+const COLORS = ["#FFCDD2", "#EF9A9A", "#E57373", "#F44336", "#D32F2F", "#B71C1C", "#FF8A80", "#FF5252"];
 
 export const AnimatedBackground = () => {
   const anims = Array.from({ length: CIRCLE_COUNT }, () => useRef(new Animated.Value(0)).current);
