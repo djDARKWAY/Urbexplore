@@ -14,6 +14,7 @@ type FilterModalProps = {
 
 const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, onReset, selectedCategories, onSelectCategory }) => {
     const [categories, setCategories] = useState<string[]>([]);
+    
     useEffect(() => {
         if (!visible) return;
         fetch('http://192.168.1.74:3001/locations/categories')
@@ -26,6 +27,14 @@ const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, on
             })
             .catch(() => setCategories([]));
     }, [visible]);
+
+    const handleApply = () => {
+        onApply();
+    };
+
+    const handleReset = () => {
+        onReset();
+    };
 
     return (
         <Modal
@@ -61,13 +70,13 @@ const FilterModal: React.FC<FilterModalProps> = ({ visible, onClose, onApply, on
                     <View style={styles.actionButtonsRow}>
                         <TouchableOpacity
                             style={styles.clearButton}
-                            onPress={onReset}
+                            onPress={handleReset}
                         >
                             <Text style={styles.clearButtonText}>Limpar</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.applyButton}
-                            onPress={onApply}
+                            onPress={handleApply}
                         >
                             <Text style={styles.applyButtonText}>Aplicar</Text>
                         </TouchableOpacity>

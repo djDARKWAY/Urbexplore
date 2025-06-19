@@ -116,7 +116,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalContainer}> 
+      <View style={[styles.modalContainer, { backgroundColor: palette.transparentBackground }]}>
         <Animated.View
           style={[styles.modalContent, { backgroundColor: dynamicPalette.background, transform: [{ translateY }] }]}
         >

@@ -16,4 +16,5 @@ export const palette = {
   loadingText: "#6c757d",
   loadingSecondaryText: "#adb5bd",
   loadingBackground: "#3A2327",
+  transparentBackground: "rgba(10,10,10,0.5)"
 };

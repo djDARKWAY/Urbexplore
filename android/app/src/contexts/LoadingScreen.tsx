@@ -10,7 +10,7 @@ import { loadingShorts } from "./texts/loadingShorts";
 const LoadingScreen = () => {
   const { scaleAnim, opacityAnim, rotate, orbit } = useLoadingAnimations();
   const [shortIndex] = useState(() => Math.floor(Math.random() * loadingShorts.length));
-  const [jokeIndex, setJokeIndex] = useState(0);
+  const [jokeIndex, setJokeIndex] = useState(() => Math.floor(Math.random() * loadingJokes.length));
 
   React.useEffect(() => {
     const jokeInterval = setInterval(() => {

@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { Modal, View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../styles/layout/mapView/mapModal.styles";
 import mapStyleTabStyles from "../styles/layout/appCustomization/mapStyleTab.styles"
 import colorPaletteTabStyles, { getColorCircleStyle } from "../styles/layout/appCustomization/colorPaletteTab.styles";
 import { useTheme } from "../contexts/ThemeContext";
 import { MapTypeModalProps } from "../interfaces/MapType";
+import { useSlideAnimation, animateModalOut, SCREEN_HEIGHT } from "../styles/animations/slideAnimation";
 
 const palette = ["#121519","#040507","#2a0c12","#0e1a2a","#0a2e22","#180d2b","#2e0c17","#33270f","#1d370c","#33210f"];
 const paletteRows = [palette.slice(0, 5), palette.slice(5, 10)];
@@ -21,25 +22,77 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
   const [activeTab, setActiveTab] = useState<"mapStyle" | "colorPalette">(
     "mapStyle"
   );
+  // Slide animation
+  const slideAnim = useSlideAnimation(visible);
+  const dragY = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [internalVisible, setInternalVisible] = useState(visible);
+  const closeRequested = useRef(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!backgroundColor || !palette.includes(backgroundColor)) {
       setBackgroundColor(defaultColor);
     }
   }, []);
 
+  // Fade in/out overlay e animação de entrada/saída
+  useEffect(() => {
+    if (visible) {
+      setInternalVisible(true);
+      closeRequested.current = false;
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    } else if (!visible && internalVisible) {
+      closeRequested.current = true;
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        animateModalOut(slideAnim, dragY, () => {
+          setInternalVisible(false);
+          closeRequested.current = false;
+        });
+      });
+    }
+  }, [visible]);
+
+  // Handler único para fechar modal com fade + slide
+  const handleClose = () => {
+    if (!closeRequested.current) {
+      closeRequested.current = true;
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        animateModalOut(slideAnim, dragY, () => {
+          setInternalVisible(false);
+          closeRequested.current = false;
+          onClose();
+        });
+      });
+    }
+  };
+
+  // Only render Modal when internalVisible is true
+  if (!internalVisible) return null;
+
   return (
     <Modal
-      visible={visible}
+      visible={internalVisible}
       transparent
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="none"
+      onRequestClose={handleClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={[styles.modalContainer, { backgroundColor: backgroundColor }]}> 
+      <Animated.View style={[styles.modalOverlay, { opacity: fadeAnim, backgroundColor: 'rgba(10,10,10,0.69)' }]}> 
+        <Animated.View style={[styles.modalContainer, { backgroundColor: backgroundColor, transform: [{ translateY: slideAnim }] }]}> 
           <TouchableOpacity
             style={styles.closeButton}
-            onPress={onClose}
+            onPress={handleClose}
           >
             <Ionicons name="close" size={28} color="#fff" />
           </TouchableOpacity>
@@ -101,7 +154,7 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
                       style={{ width: '48%', marginBottom: 10, alignItems: 'center' }}
                       onPress={() => {
                         onSelect(opt.type as any);
-                        onClose();
+                        handleClose();
                       }}
                       activeOpacity={0.85}
                     >                 
@@ -152,8 +205,8 @@ const MapTypeModal: React.FC<MapTypeModalProps> = ({
               </View>
             )}
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 };

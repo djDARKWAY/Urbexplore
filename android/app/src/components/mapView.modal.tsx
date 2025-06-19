@@ -28,7 +28,7 @@ const MapViewFullScreen = () => {
   const [places, setPlaces] = useState<LocationType[]>([])
   const [selected, setSelected] = useState<LocationType | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
-  const [, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [mapType, setMapType] = useState<'standard' | 'dark' | 'satellite' | 'haunted'>('haunted')
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false)
   const [filterModalVisible, setFilterModalVisible] = useState(false);
@@ -61,9 +61,8 @@ const MapViewFullScreen = () => {
     lon: l.lon ?? 0,
     totalRate: l.totalRate ?? 0,
   });
-
   // Função para fazer fetch dos dados
-  const fetchData = useCallback(async (region = currentRegion, isInitial = false) => {
+  const fetchData = useCallback(async (region = currentRegion, isInitial = false, categories = selectedCategories) => {
     if (!region) return;
     if (isInitial) setInitialLoading(true);
     setError(null);
@@ -73,9 +72,15 @@ const MapViewFullScreen = () => {
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
 
-      const apiResponse = await fetch(
-        `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`
-      ).then(res => res.json());
+      let url = `http://192.168.1.74:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
+      
+      // Adiciona filtros de categoria se existirem e não sejam apenas strings vazias
+      if (categories && categories.filter(c => c && c.trim() !== '').length > 0) {
+        const categoriesParam = categories.filter(c => c && c.trim() !== '').join(',');
+        url += `&categories=${encodeURIComponent(categoriesParam)}`;
+      }
+
+      const apiResponse = await fetch(url).then(res => res.json());
       setPlaces(apiResponse.locations.map(mapLocationData));
     } catch (e: any) {
       setError(e.message);
@@ -83,19 +88,16 @@ const MapViewFullScreen = () => {
     } finally {
       if (isInitial) setInitialLoading(false);
     }
-  }, []);
-
+  }, [selectedCategories]);
   // Função com debounce para fazer fetch após parar o movimento
-  const debouncedFetchData = useCallback((region: typeof initialRegion) => {
+  const debouncedFetchData = useCallback((region: typeof initialRegion, categories = selectedCategories) => {
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
     debounceTimeoutRef.current = setTimeout(() => {
-      fetchData(region);
+      fetchData(region, false, categories);
     }, 100);
-  }, [fetchData]);
-
-  // Load inicial da localização e locais
+  }, [fetchData, selectedCategories]);  // Load inicial da localização e locais
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -146,7 +148,6 @@ const MapViewFullScreen = () => {
       });
     }
   }, []);
-
   // Agenda pesquisa com debounce quando termina o movimento
   const handleRegionChangeComplete = useCallback((reg: typeof initialRegion) => {
     setCurrentRegion(reg);
@@ -155,14 +156,25 @@ const MapViewFullScreen = () => {
         setHeading(camera.heading || 0);
       });
     }
-    debouncedFetchData(reg);
-  }, [debouncedFetchData]);
-
+    debouncedFetchData(reg, selectedCategories);
+  }, [debouncedFetchData, selectedCategories]);
   // Função memoizada para abrir modal de detalhes
   const handleMarkerPress = useCallback((place: LocationType) => {
     setSelected(place);
     setModalVisible(true);
   }, []);
+
+  // Função para aplicar filtros
+  const applyFilters = useCallback(() => {
+    setFilterModalVisible(false);
+    fetchData(currentRegion, false, selectedCategories);
+  }, [fetchData, currentRegion, selectedCategories]);
+
+  // Função para limpar filtros
+  const clearFilters = useCallback(() => {
+    setSelectedCategories([]);
+    fetchData(currentRegion, false, []);
+  }, [fetchData, currentRegion]);
 
   // Calcula distância entre dois pontos
   const dist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -281,31 +293,20 @@ const MapViewFullScreen = () => {
         ))}
       </MapView>
       
-      {/* Botão filtro no canto superior direito, respeitando safe-area */}
+      {/* Botão filtro */}
       <TouchableOpacity
-        style={[
-          mapStyles.button,
-          {
-            top: insets.top + 16,
-            right: 16,
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-            position: 'absolute',
-            zIndex: 10,
-          },
-        ]}
+        style={mapStyles.filterTopButton}
         onPress={() => setFilterModalVisible(true)}
       >
         <Ionicons name="filter" size={24} color="#AAAAAA" />
       </TouchableOpacity>
-
+      
       {/* Modal de Filtros */}
       <FilterModal
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
-        onApply={() => setFilterModalVisible(false)}
-        onReset={() => setSelectedCategories([])}
+        onApply={applyFilters}
+        onReset={clearFilters}
         selectedCategories={selectedCategories}
         onSelectCategory={(cat) => setSelectedCategories((prev) => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
       />
