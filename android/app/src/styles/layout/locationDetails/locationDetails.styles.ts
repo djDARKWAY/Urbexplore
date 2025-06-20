@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { palette } from "../../palette";
 
-const styles = StyleSheet.create({
+const locationDetails = StyleSheet.create({
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default styles;
+export default locationDetails;

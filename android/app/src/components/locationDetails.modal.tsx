@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView, Modal, Animated, PanResponder, Linking, Platform, Share, Dimensions } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../styles/layout/locationDetails/detailsModal.styles";
+import locationDetails from "../styles/layout/locationDetails/locationDetails.styles";
 import { useTheme } from "../contexts/ThemeContext";
 import { getDynamicPalette } from "../utils/themeUtils";
 import { palette } from "../styles/palette";
@@ -130,7 +130,6 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
     </View>
   );
 
-  // Funções de navegação agora apenas trocam o índice
   const goToPrevImage = () => {
     if (currentImageIndex > 0) {
       setCurrentImageIndex(currentImageIndex - 1);
@@ -149,12 +148,12 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={[styles.modalContainer, { backgroundColor: palette.transparentBackground }]}> 
+      <View style={[locationDetails.modalContainer, { backgroundColor: palette.transparentBackground }]}> 
         <Animated.View
-          style={[styles.modalContent, { backgroundColor: dynamicPalette.background, transform: [{ translateY }] }]}
+          style={[locationDetails.modalContent, { backgroundColor: dynamicPalette.background, transform: [{ translateY }] }]}
         >
             {/* Imagem com setas */}
-            <Animated.View style={styles.imageContainer} {...panResponder.panHandlers}>
+            <Animated.View style={locationDetails.imageContainer} {...panResponder.panHandlers}>
             {location.images?.length ? (
               <View style={{ width: windowWidth, height: imageHeight, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent', overflow: 'hidden' }}>
                 {location.images.length > 1 && (
@@ -179,51 +178,51 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
                 </TouchableOpacity>
               </View>
             ) : null}
-            <TouchableOpacity style={styles.closeButton} onPress={closeWithAnimation}>
+            <TouchableOpacity style={locationDetails.closeButton} onPress={closeWithAnimation}>
               <Ionicons name="close" size={20} color="#fff" />
             </TouchableOpacity>
             </Animated.View>
 
-          <ScrollView style={styles.infoContainer} contentContainerStyle={{ paddingBottom: 90 }}>
-            <View style={styles.headerContainer}>
-              <Text style={styles.title}>{location.title}</Text>
+          <ScrollView style={locationDetails.infoContainer} contentContainerStyle={{ paddingBottom: 90 }}>
+            <View style={locationDetails.headerContainer}>
+              <Text style={locationDetails.title}>{location.title}</Text>
             </View>
-            {location.description && <Text style={styles.description}>{location.description}</Text>}
+            {location.description && <Text style={locationDetails.description}>{location.description}</Text>}
             
             {location.category && (
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Tipo:</Text>
-                <Text style={styles.infoValue}>{location.category}</Text>
+              <View style={locationDetails.infoRow}>
+                <Text style={locationDetails.infoLabel}>Tipo:</Text>
+                <Text style={locationDetails.infoValue}>{location.category}</Text>
               </View>
             )}
             {location.condition && (
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Condição:</Text>
-                <Text style={styles.infoValue}>{location.condition}</Text>
+              <View style={locationDetails.infoRow}>
+                <Text style={locationDetails.infoLabel}>Condição:</Text>
+                <Text style={locationDetails.infoValue}>{location.condition}</Text>
               </View>
             )}
             {location.accessLevel && (
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Acesso:</Text>
-                <Text style={styles.infoValue}>{location.accessLevel}</Text>
+              <View style={locationDetails.infoRow}>
+                <Text style={locationDetails.infoLabel}>Acesso:</Text>
+                <Text style={locationDetails.infoValue}>{location.accessLevel}</Text>
               </View>
             )}
             {location.yearAbandoned !== undefined && location.yearAbandoned !== null && (
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Abandonado em:</Text>
-                <Text style={styles.infoValue}>{String(location.yearAbandoned)}</Text>
+              <View style={locationDetails.infoRow}>
+                <Text style={locationDetails.infoLabel}>Abandonado em:</Text>
+                <Text style={locationDetails.infoValue}>{String(location.yearAbandoned)}</Text>
               </View>
             )}
 
             {location.rating !== undefined && location.rating !== null && renderStars(location.rating, location.totalRate)}
 
             {location.warnings && location.warnings.length > 0 && (
-              <View style={styles.warningsContainer}>
-                <Text style={styles.warningsTitle}>Avisos:</Text>
+              <View style={locationDetails.warningsContainer}>
+                <Text style={locationDetails.warningsTitle}>Avisos:</Text>
                 {location.warnings.map((warning, index) => (
-                  <View key={index} style={styles.warningItem}>
+                  <View key={index} style={locationDetails.warningItem}>
                     <Ionicons name="warning" size={16} color="#FFA500" />
-                    <Text style={styles.warningText}>{warning}</Text>
+                    <Text style={locationDetails.warningText}>{warning}</Text>
                   </View>
                 ))}
               </View>
@@ -247,15 +246,15 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
             )}
           </ScrollView>
 
-          <View style={styles.fixedActionContainer}>
-            <TouchableOpacity style={styles.actionButton} onPress={() => openMap(location.lat, location.lon)}>
+          <View style={locationDetails.fixedActionContainer}>
+            <TouchableOpacity style={locationDetails.actionButton} onPress={() => openMap(location.lat, location.lon)}>
               <Ionicons name="navigate" size={24} color="#fff" />
-              <Text style={styles.actionText}>Navegar</Text>
+              <Text style={locationDetails.actionText}>Navegar</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton} onPress={shareLocation}>
+            <TouchableOpacity style={locationDetails.actionButton} onPress={shareLocation}>
               <Ionicons name="share-social" size={24} color="#fff" />
-              <Text style={styles.actionText}>Compartilhar</Text>
+              <Text style={locationDetails.actionText}>Compartilhar</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -282,7 +281,7 @@ const LocationDetailsModal: React.FC<LocationDetailsModalProps> = ({ visible, on
               </View>
             )}
             renderHeader={() => (
-              <TouchableOpacity style={[styles.closeButton, { top: 40, right: 20, zIndex: 10 }]} onPress={() => setFullscreen(false)}>
+              <TouchableOpacity style={[locationDetails.closeButton, { top: 40, right: 20, zIndex: 10 }]} onPress={() => setFullscreen(false)}>
                 <Ionicons name="close" size={28} color="#fff" />
               </TouchableOpacity>
             )}

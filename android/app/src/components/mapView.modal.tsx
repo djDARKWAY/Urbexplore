@@ -34,6 +34,8 @@ const MapViewFullScreen = () => {
   const [mapTypeModalVisible, setMapTypeModalVisible] = useState(false)
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [selectedAccessLevels, setSelectedAccessLevels] = useState<string[]>([]);
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const initialRegion = { latitude: 39.5, longitude: -8.0, latitudeDelta: 5.5, longitudeDelta: 6.5 }
   const [currentRegion, setCurrentRegion] = useState<typeof initialRegion>(initialRegion)
@@ -65,7 +67,7 @@ const MapViewFullScreen = () => {
   });
   
   // Função para fazer fetch dos dados
-  const fetchData = useCallback(async (region = currentRegion, isInitial = false, categories = selectedCategories) => {
+  const fetchData = useCallback(async (region = currentRegion, isInitial = false, categories = selectedCategories, conditions = selectedConditions, accessLevels = selectedAccessLevels) => {
     if (!region) return;
     if (isInitial) setInitialLoading(true);
     setError(null);
@@ -75,14 +77,16 @@ const MapViewFullScreen = () => {
       const minLon = region.longitude - region.longitudeDelta / 2;
       const maxLon = region.longitude + region.longitudeDelta / 2;
 
-      let url = `http://192.168.1.92:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
-      
-      // Adiciona filtros de categoria se existirem e não sejam apenas strings vazias
+      let url = `http://192.168.1.100:3001/locations?minLat=${minLat}&maxLat=${maxLat}&minLon=${minLon}&maxLon=${maxLon}`;
       if (categories && categories.filter(c => c && c.trim() !== '').length > 0) {
-        const categoriesParam = categories.filter(c => c && c.trim() !== '').join(',');
-        url += `&categories=${encodeURIComponent(categoriesParam)}`;
+        url += `&categories=${categories.join(',')}`;
       }
-
+      if (conditions && conditions.filter(c => c && c.trim() !== '').length > 0) {
+        url += `&conditions=${conditions.join(',')}`;
+      }
+      if (accessLevels && accessLevels.filter(a => a && a.trim() !== '').length > 0) {
+        url += `&accessLevels=${accessLevels.join(',')}`;
+      }
       const apiResponse = await fetch(url).then(res => res.json());
       setPlaces(apiResponse.locations.map(mapLocationData));
     } catch (e: any) {
@@ -91,17 +95,17 @@ const MapViewFullScreen = () => {
     } finally {
       if (isInitial) setInitialLoading(false);
     }
-  }, [selectedCategories]);
+  }, [selectedCategories, selectedConditions, selectedAccessLevels]);
 
   // Função com debounce para fazer fetch após parar o movimento
-  const debouncedFetchData = useCallback((region: typeof initialRegion, categories = selectedCategories) => {
+  const debouncedFetchData = useCallback((region: typeof initialRegion, categories = selectedCategories, conditions = selectedConditions, accessLevels = selectedAccessLevels) => {
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);
     }
     debounceTimeoutRef.current = setTimeout(() => {
-      fetchData(region, false, categories);
+      fetchData(region, false, categories, conditions, accessLevels);
     }, 100);
-  }, [fetchData, selectedCategories]);
+  }, [fetchData, selectedCategories, selectedConditions, selectedAccessLevels]);
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -173,13 +177,15 @@ const MapViewFullScreen = () => {
   // Função para aplicar filtros
   const applyFilters = useCallback(() => {
     setFilterModalVisible(false);
-    fetchData(currentRegion, false, selectedCategories);
-  }, [fetchData, currentRegion, selectedCategories]);
+    fetchData(currentRegion, false, selectedCategories, selectedConditions, selectedAccessLevels);
+  }, [fetchData, currentRegion, selectedCategories, selectedConditions, selectedAccessLevels]);
 
   // Função para limpar filtros
   const clearFilters = useCallback(() => {
     setSelectedCategories([]);
-    fetchData(currentRegion, false, []);
+    setSelectedConditions([]);
+    setSelectedAccessLevels([]);
+    fetchData(currentRegion, false, [], [], []);
   }, [fetchData, currentRegion]);
 
   // Calcula distância entre dois pontos
@@ -309,7 +315,7 @@ const MapViewFullScreen = () => {
         ))}
       </MapView>
       
-      {/* Botão filtro de localizações*/}
+      {/* Botão filtro de localizações */}
       <TouchableOpacity
         style={mapStyles.filterTopButton}
         onPress={() => setFilterModalVisible(true)}
@@ -317,7 +323,7 @@ const MapViewFullScreen = () => {
         <Ionicons name="filter" size={24} color="#AAAAAA" />
       </TouchableOpacity>
       
-      {/* Modal de filtro de localizações*/}
+      {/* Modal de filtro de localizações */}
       <FilterModal
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
@@ -325,6 +331,10 @@ const MapViewFullScreen = () => {
         onReset={clearFilters}
         selectedCategories={selectedCategories}
         onSelectCategory={(cat) => setSelectedCategories((prev) => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])}
+        selectedConditions={selectedConditions}
+        onSelectCondition={(cond) => setSelectedConditions((prev) => prev.includes(cond) ? prev.filter(c => c !== cond) : [...prev, cond])}
+        selectedAccessLevels={selectedAccessLevels}
+        onSelectAccessLevel={(level) => setSelectedAccessLevels((prev) => prev.includes(level) ? prev.filter(l => l !== level) : [...prev, level])}
       />
 
       {/* Botão de personalização do mapa */}
@@ -386,7 +396,7 @@ const MapViewFullScreen = () => {
         );
       })()}
 
-      {/* Modal de detalhes do local */}
+      {/* Modal de detalhes */}
       {selected && (
         <LocationDetailsModal
           visible={modalVisible}

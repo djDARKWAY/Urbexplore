@@ -20,26 +20,19 @@ export const markerStylesFn = (backgroundColor: string) =>
   });
 
 export const getMarkerIcon = (category: string) => {
-  switch (category) {
-    case "Sanatório":
-      return "hospital";
-    case "Mina":
-      return "hard-hat";
-    case "Portagem":
-      return "road-variant";
-    case "Moradia":
-      return "home";
-    case "Palácio":
-      return "castle";
-    case "Edifício":
-      return "office-building";
-    case "Industrial":
-      return "factory";
-    case "Religião":
-      return "church";
-    case "Hotel":
-      return "bed";
-    case "Quinta":
-      return "barn";
-  }
+  const categoryIconMap: Record<string, string> = {
+    "Sanatório": "hospital",
+    "Mina": "hard-hat",
+    "Portagem": "road-variant",
+    "Moradia": "home",
+    "Palácio": "castle",
+    "Edifício": "office-building",
+    "Industrial": "factory",
+    "Religião": "church",
+    "Hotel": "bed",
+    "Quinta": "barn",
+    "Atrações": "ferris-wheel",
+  };
+
+  return categoryIconMap[category];
 };
